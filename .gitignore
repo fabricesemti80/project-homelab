@@ -1,0 +1,62 @@
+# ---- OS / editor noise ----
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*.tmp
+*.bak
+.idea/
+.vscode/
+
+# ---- Logs / runtime ----
+*.log
+logs/
+*.pid
+*.out
+
+# ---- Environment / secrets ----
+.env
+.env.*
+*.pem
+*.key
+*.p12
+*.kubeconfig
+kubeconfig
+secrets/
+**/secrets/**
+*.age
+sops.*
+*.enc
+
+# ---- Terraform ----
+.terraform/
+.terraform.lock.hcl
+*.tfstate
+*.tfstate.*
+crash.log
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# ---- Ansible ----
+*.retry
+ansible.cfg.local
+
+# ---- Python ----
+__pycache__/
+*.pyc
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+
+# ---- Node ----
+node_modules/
+dist/
+build/
+
+# ---- Containers / local data ----
+*.tar
+data/
+.tmp/
