@@ -1,0 +1,14 @@
+name: homelab
+
+include:
+  - ./traefik/compose.yml
+  - ./cloudflared/compose.yml
+  - ./arcane/compose.yml
+  - ./beszel/compose.yml
+  - ./whoami/compose.yml
+  - ./omni/compose.yml
+
+networks:
+  proxy:
+    name: homelab_proxy
+

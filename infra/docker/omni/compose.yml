@@ -1,0 +1,82 @@
+services:
+  dex:
+    image: ghcr.io/dexidp/dex:v2.41.1
+    platform: ${HOMELAB_DOCKER_PLATFORM:-linux/amd64}
+    container_name: dex
+    restart: unless-stopped
+    user: "0"
+    ports:
+      - "5556:5556"
+    command:
+      - dex
+      - serve
+      - /etc/dex/config.docker.yaml
+    volumes:
+      - ${HOMELAB_DOCKER_ROOT:-.}/runtime/secrets/omni/dex.yaml:/etc/dex/config.docker.yaml:ro
+      - ${HOMELAB_DOCKER_ROOT:-.}/runtime/secrets/omni/server-chain.pem:/etc/dex/tls/server-chain.pem:ro
+      - ${HOMELAB_DOCKER_ROOT:-.}/runtime/secrets/omni/server-key.pem:/etc/dex/tls/server-key.pem:ro
+      - omni_dex_data:/var/dex
+    networks:
+      - proxy
+
+  omni:
+    image: ${OMNI_IMAGE:-ghcr.io/siderolabs/omni:latest}
+    platform: ${HOMELAB_DOCKER_PLATFORM:-linux/amd64}
+    container_name: omni
+    restart: unless-stopped
+    depends_on:
+      - dex
+    network_mode: host
+    cap_add:
+      - NET_ADMIN
+    devices:
+      - /dev/net/tun:/dev/net/tun
+    extra_hosts:
+      - ${OMNI_AUTH_ENDPOINT:-auth.krapulax.dev}:127.0.0.1
+      - ${OMNI_ENDPOINT:-omni.krapulax.dev}:127.0.0.1
+    command:
+      - --config-path=/etc/omni/omni.yaml
+      - --name=${OMNI_NAME:-trinity}
+      - --private-key-source=file:///omni.asc
+      - --cert=/server-chain.pem
+      - --key=/server-key.pem
+      - --machine-api-cert=/server-chain.pem
+      - --machine-api-key=/server-key.pem
+      - --bind-addr=${OMNI_BIND_ADDR:-0.0.0.0:8443}
+      - --machine-api-bind-addr=${OMNI_MACHINE_API_BIND_ADDR:-0.0.0.0:8095}
+      - --machine-api-advertised-url=${OMNI_MACHINE_API_ADVERTISED_URL:-https://omni.krapulax.dev:8095/}
+      - --advertised-api-url=${OMNI_ADVERTISED_API_URL:-https://omni.krapulax.dev/}
+      - --k8s-proxy-bind-addr=${OMNI_KUBERNETES_PROXY_BIND_ADDR:-0.0.0.0:8100}
+      - --advertised-kubernetes-proxy-url=${OMNI_ADVERTISED_KUBERNETES_PROXY_URL:-https://omni.krapulax.dev:8100/}
+      - --event-sink-port=${OMNI_EVENT_SINK_PORT:-8091}
+      - --siderolink-wireguard-bind-addr=${OMNI_SIDEROLINK_WIREGUARD_BIND_ADDR:-0.0.0.0:50180}
+      - --siderolink-wireguard-advertised-addr=${OMNI_SIDEROLINK_WIREGUARD_ADVERTISED_ADDR:-omni.krapulax.dev:50180}
+      - --auth-auth0-enabled=false
+      - --auth-oidc-enabled=true
+      - --auth-oidc-provider-url=${OMNI_AUTH_PROVIDER_URL:-https://auth.krapulax.dev}
+      - --auth-oidc-client-id=omni
+      - --auth-oidc-scopes=openid
+      - --auth-oidc-scopes=profile
+      - --auth-oidc-scopes=email
+      - --sqlite-storage-path=/_out/sqlite/omni.db
+      - --initial-users=${OMNI_USER_EMAIL:?OMNI_USER_EMAIL is required}
+    volumes:
+      - ${HOMELAB_DOCKER_ROOT:-.}/runtime/secrets/omni/ca.pem:/etc/ssl/certs/ca-certificates.crt:ro
+      - ${HOMELAB_DOCKER_ROOT:-.}/runtime/secrets/omni/omni.asc:/omni.asc:ro
+      - ${HOMELAB_DOCKER_ROOT:-.}/runtime/secrets/omni/omni.yaml:/etc/omni/omni.yaml:ro
+      - ${HOMELAB_DOCKER_ROOT:-.}/runtime/secrets/omni/server-chain.pem:/server-chain.pem:ro
+      - ${HOMELAB_DOCKER_ROOT:-.}/runtime/secrets/omni/server-key.pem:/server-key.pem:ro
+      - omni_etcd_data:/_out/etcd
+      - omni_sqlite_data:/_out/sqlite
+
+networks:
+  proxy:
+    name: homelab_proxy
+
+volumes:
+  omni_dex_data:
+    name: homelab_omni_dex_data
+  omni_etcd_data:
+    name: homelab_omni_etcd_data
+  omni_sqlite_data:
+    name: homelab_omni_sqlite_data

@@ -60,3 +60,11 @@ build/
 *.tar
 data/
 .tmp/
+
+# ---- Local Docker homelab deployment ----
+.envrc
+.envrc.*
+infra/docker/.env
+infra/docker/runtime/
+infra/docker/secrets/
+infra/docker/data/
