@@ -45,6 +45,7 @@ services:
     #   - ${OMNI_ENDPOINT:-omni.krapulax.dev}:127.0.0.1
     command:
       - --config-path=/etc/omni/omni.yaml
+      - --account-id=${OMNI_ACCOUNT_ID:?OMNI_ACCOUNT_ID is required}
       - --name=${OMNI_NAME:-trinity}
       - --private-key-source=file:///omni.asc
       - --cert=/server-chain.pem

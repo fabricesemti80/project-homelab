@@ -70,3 +70,4 @@ infra/docker/.env
 infra/docker/runtime/
 infra/docker/secrets/
 infra/docker/data/
+scratch/

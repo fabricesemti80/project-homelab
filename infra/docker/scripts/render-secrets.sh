@@ -91,6 +91,12 @@ write_dotenv() {
     printf 'OMNI_SIDEROLINK_WIREGUARD_ADVERTISED_ADDR=%s\n' "$(dotenv_quote "${OMNI_SIDEROLINK_WIREGUARD_ADVERTISED_ADDR:-omni.krapulax.dev:50180}")"
     printf 'OMNI_AUTH_PROVIDER_URL=%s\n' "$(dotenv_quote "$omni_auth_provider_url")"
     printf 'OMNI_USER_EMAIL=%s\n' "$(dotenv_quote "$OMNI_USER_EMAIL")"
+    printf 'OMNI_ACCOUNT_ID=%s\n' "$(dotenv_quote "${OMNI_ACCOUNT_ID:-}")"
+    printf 'OMNI_SERVICE_ACCOUNT_KEY=%s\n' "$(dotenv_quote "${OMNI_SERVICE_ACCOUNT_KEY:-}")"
+    printf 'PM_API_URL=%s\n' "$(dotenv_quote "${PM_API_URL:-}")"
+    printf 'PM_API_TOKEN_ID=%s\n' "$(dotenv_quote "${PM_API_TOKEN_ID:-}")"
+    printf 'PM_API_TOKEN_SECRET=%s\n' "$(dotenv_quote "${PM_API_TOKEN_SECRET:-}")"
+
   } >"$env_file"
   chmod 0600 "$env_file"
 }

@@ -7,6 +7,7 @@ yamllint = "latest"
 terraform = "latest"
 shfmt = "latest"
 prettier = "latest"
+omnictl = "latest"
 
 [tasks.validate]
 description = "Validate repository structure and required files"
