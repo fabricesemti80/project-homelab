@@ -18,6 +18,13 @@ services:
       - omni_dex_data:/var/dex
     networks:
       - proxy
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.dex.rule=Host(`${OMNI_AUTH_ENDPOINT:-auth.krapulax.dev}`)"
+      - "traefik.http.routers.dex.entrypoints=web"
+      - "traefik.http.routers.dex.service=dex"
+      - "traefik.http.services.dex.loadbalancer.server.port=5556"
+      - "traefik.http.services.dex.loadbalancer.server.scheme=https"
 
   omni:
     image: ${OMNI_IMAGE:-ghcr.io/siderolabs/omni:latest}
@@ -26,14 +33,16 @@ services:
     restart: unless-stopped
     depends_on:
       - dex
-    network_mode: host
+    networks:
+      - proxy
+    ports:
+      - "50180:50180/udp"
     cap_add:
       - NET_ADMIN
     devices:
       - /dev/net/tun:/dev/net/tun
-    extra_hosts:
-      - ${OMNI_AUTH_ENDPOINT:-auth.krapulax.dev}:127.0.0.1
-      - ${OMNI_ENDPOINT:-omni.krapulax.dev}:127.0.0.1
+    # extra_hosts:
+    #   - ${OMNI_ENDPOINT:-omni.krapulax.dev}:127.0.0.1
     command:
       - --config-path=/etc/omni/omni.yaml
       - --name=${OMNI_NAME:-trinity}
@@ -51,23 +60,30 @@ services:
       - --event-sink-port=${OMNI_EVENT_SINK_PORT:-8091}
       - --siderolink-wireguard-bind-addr=${OMNI_SIDEROLINK_WIREGUARD_BIND_ADDR:-0.0.0.0:50180}
       - --siderolink-wireguard-advertised-addr=${OMNI_SIDEROLINK_WIREGUARD_ADVERTISED_ADDR:-omni.krapulax.dev:50180}
-      - --auth-auth0-enabled=false
       - --auth-oidc-enabled=true
-      - --auth-oidc-provider-url=${OMNI_AUTH_PROVIDER_URL:-https://auth.krapulax.dev}
+      - --auth-oidc-provider-url=https://auth.krapulax.dev
       - --auth-oidc-client-id=omni
-      - --auth-oidc-scopes=openid
-      - --auth-oidc-scopes=profile
-      - --auth-oidc-scopes=email
+      - --auth-oidc-client-secret=${OMNI_DEX_CLIENT_SECRET}
+      - --auth-oidc-scopes=openid,profile,email
       - --sqlite-storage-path=/_out/sqlite/omni.db
       - --initial-users=${OMNI_USER_EMAIL:?OMNI_USER_EMAIL is required}
+      - --auth-webauthn-enabled=false
     volumes:
-      - ${HOMELAB_DOCKER_ROOT:-.}/runtime/secrets/omni/ca.pem:/etc/ssl/certs/ca-certificates.crt:ro
+      - ${HOMELAB_DOCKER_ROOT:-.}/runtime/secrets/omni/full-chain.pem:/etc/ssl/certs/ca-certificates.crt:ro
       - ${HOMELAB_DOCKER_ROOT:-.}/runtime/secrets/omni/omni.asc:/omni.asc:ro
       - ${HOMELAB_DOCKER_ROOT:-.}/runtime/secrets/omni/omni.yaml:/etc/omni/omni.yaml:ro
       - ${HOMELAB_DOCKER_ROOT:-.}/runtime/secrets/omni/server-chain.pem:/server-chain.pem:ro
       - ${HOMELAB_DOCKER_ROOT:-.}/runtime/secrets/omni/server-key.pem:/server-key.pem:ro
       - omni_etcd_data:/_out/etcd
       - omni_sqlite_data:/_out/sqlite
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.omni.rule=Host(`${OMNI_ENDPOINT:-omni.krapulax.dev}`)"
+      - "traefik.http.routers.omni.entrypoints=web"
+      - "traefik.http.routers.omni.service=omni"
+      # Omni is on host network, so we route to host IP from Traefik
+      - "traefik.http.services.omni.loadbalancer.server.port=8443"
+      - "traefik.http.services.omni.loadbalancer.server.scheme=https"
 
 networks:
   proxy:

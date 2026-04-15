@@ -31,6 +31,15 @@ remote_base="$(basename "$remote_dir")"
 
 ssh "$remote_host" "mkdir -p '$remote_dir' 2>/dev/null || { sudo mkdir -p '$remote_dir' && sudo chown -R \"\$(id -u):\$(id -g)\" '$remote_parent'; }"
 
-tar -C "$docker_root" \
-  --exclude '.DS_Store' \
-  -cz . | ssh "$remote_host" "tar -xzf - -C '$remote_dir' && cd '$remote_dir' && $remote_compose -f docker-compose.yml up -d --remove-orphans"
+# Sync all docker service definitions
+rsync -avz --exclude '.DS_Store' --exclude '._*' --exclude 'runtime' \
+  "$docker_root/" "$remote_host:$remote_dir/"
+
+# Sync runtime files without deleting the parent directory (which breaks bind mounts)
+rsync -avz --delete --exclude '.DS_Store' --exclude '._*' \
+  "$docker_root/runtime/" "$remote_host:$remote_dir/runtime/"
+
+ssh "$remote_host" "sudo rsync -avz --no-perms --no-owner --no-group '$remote_dir/runtime/' /opt/project-homelab/infra/docker/runtime/"
+
+# Start stack; use --force-recreate to ensure stale bind mounts are refreshed if runtime was wiped
+ssh "$remote_host" "cd '$remote_dir' && $remote_compose -f docker-compose.yml up -d --remove-orphans --force-recreate"

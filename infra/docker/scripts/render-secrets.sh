@@ -12,7 +12,7 @@ if [ -f "${repo_root}/.envrc" ]; then
 fi
 
 required_vars=(
-  CLOUDFLARED_TUNNEL_TOKEN
+  TAILSCALE_AUTH_KEY
   OMNI_CA_CERT_PEM
   OMNI_TLS_CERT_PEM
   OMNI_TLS_KEY_PEM
@@ -45,10 +45,14 @@ dotenv_quote() {
 }
 
 write_dotenv() {
-  local env_file="${docker_root}/.env"
-  {
-    printf 'COMPOSE_PROJECT_NAME=%s\n' "$(dotenv_quote "${COMPOSE_PROJECT_NAME:-homelab}")"
-    printf 'HOMELAB_DOCKER_ROOT=%s\n' "$(dotenv_quote "${HOMELAB_DOCKER_ROOT:-.}")"
+   local env_file="${docker_root}/.env"
+   local docker_root_value="${HOMELAB_DOCKER_ROOT:-}"
+   if [ -z "$docker_root_value" ]; then
+     docker_root_value="$docker_root"
+   fi
+   {
+     printf 'COMPOSE_PROJECT_NAME=%s\n' "$(dotenv_quote "${COMPOSE_PROJECT_NAME:-homelab}")"
+     printf 'HOMELAB_DOCKER_ROOT=%s\n' "$(dotenv_quote "$docker_root_value")"
     printf 'HOMELAB_DOCKER_PLATFORM=%s\n' "$(dotenv_quote "${HOMELAB_DOCKER_PLATFORM:-linux/amd64}")"
     [ -z "${COMPOSE_PROFILES:-}" ] || printf 'COMPOSE_PROFILES=%s\n' "$(dotenv_quote "$COMPOSE_PROFILES")"
     printf 'PUID=%s\n' "$(dotenv_quote "${PUID:-1000}")"
@@ -78,6 +82,7 @@ write_dotenv() {
     printf 'OMNI_KUBERNETES_PROXY_BIND_ADDR=%s\n' "$(dotenv_quote "${OMNI_KUBERNETES_PROXY_BIND_ADDR:-0.0.0.0:8100}")"
     printf 'OMNI_ADVERTISED_KUBERNETES_PROXY_URL=%s\n' "$(dotenv_quote "${OMNI_ADVERTISED_KUBERNETES_PROXY_URL:-https://${omni_host}:8100/}")"
     printf 'OMNI_EVENT_SINK_PORT=%s\n' "$(dotenv_quote "${OMNI_EVENT_SINK_PORT:-8091}")"
+  printf 'OMNI_DEX_CLIENT_SECRET=%s\n' "$(dotenv_quote "${OMNI_DEX_CLIENT_SECRET:-}")"
     printf 'OMNI_SIDEROLINK_WIREGUARD_BIND_ADDR=%s\n' "$(dotenv_quote "${OMNI_SIDEROLINK_WIREGUARD_BIND_ADDR:-0.0.0.0:50180}")"
     printf 'OMNI_SIDEROLINK_WIREGUARD_ADVERTISED_ADDR=%s\n' "$(dotenv_quote "${OMNI_SIDEROLINK_WIREGUARD_ADVERTISED_ADDR:-omni.krapulax.dev:50180}")"
     printf 'OMNI_AUTH_PROVIDER_URL=%s\n' "$(dotenv_quote "$omni_auth_provider_url")"
@@ -85,42 +90,24 @@ write_dotenv() {
   } >"$env_file"
   chmod 0600 "$env_file"
 }
-cloudflared_dir="${docker_root}/runtime/secrets/cloudflared"
+tailscale_dir="${docker_root}/runtime/secrets/tailscale"
 omni_dir="${docker_root}/runtime/secrets/omni"
 traefik_dynamic_dir="${docker_root}/runtime/traefik/dynamic"
 
-mkdir -p "$cloudflared_dir" "$omni_dir" "$traefik_dynamic_dir"
-chmod 700 "${docker_root}/runtime" "${docker_root}/runtime/secrets" "$cloudflared_dir" "$omni_dir"
+mkdir -p "$tailscale_dir" "$omni_dir" "$traefik_dynamic_dir"
+chmod 700 "${docker_root}/runtime" "${docker_root}/runtime/secrets" "$tailscale_dir" "$omni_dir"
 
-secret_file="$(mktemp)"
-config_file="$(mktemp)"
-trap 'rm -f "$secret_file" "$config_file"' EXIT
-printf '%s\n' "$CLOUDFLARED_TUNNEL_TOKEN" >"$secret_file"
-
-if jq -e 'type == "object" and has("AccountTag") and has("TunnelSecret") and has("TunnelID")' "$secret_file" >/dev/null 2>&1; then
-  tunnel_id="$(jq -r '.TunnelID' "$secret_file")"
-  printf '%s\n' \
-    "tunnel: ${tunnel_id}" \
-    "credentials-file: /etc/cloudflared/credentials.json" \
-    "ingress:" \
-    "  - service: http://127.0.0.1:80" \
-    >"${cloudflared_dir}/config.yml"
-  install -m 0600 "$secret_file" "${cloudflared_dir}/credentials.json"
-  rm -f "${cloudflared_dir}/token"
-else
-  printf '%s\n' \
-    "ingress:" \
-    "  - service: http://127.0.0.1:80" \
-    >"${cloudflared_dir}/config.yml"
-  install -m 0600 "$secret_file" "${cloudflared_dir}/token"
-  rm -f "${cloudflared_dir}/credentials.json"
-fi
-chmod 0600 "${cloudflared_dir}/config.yml"
+printf '%s\n' "$TAILSCALE_AUTH_KEY" >"${tailscale_dir}/auth_key"
+chmod 0600 "${tailscale_dir}/auth_key"
 
 printf '%s\n' "$OMNI_CA_CERT_PEM" >"${omni_dir}/ca.pem"
 printf '%s\n%s\n' "$OMNI_TLS_CERT_PEM" "$OMNI_CA_CERT_PEM" >"${omni_dir}/server-chain.pem"
 printf '%s\n' "$OMNI_TLS_KEY_PEM" >"${omni_dir}/server-key.pem"
 printf '%s\n' "$OMNI_GPG_KEY_ASC" >"${omni_dir}/omni.asc"
+
+# Create a full cert chain with server cert + all CAs for TLS verification
+# This allows Omni to trust certificates issued by our CA
+printf '%s\n%s\n' "$OMNI_TLS_CERT_PEM" "$OMNI_CA_CERT_PEM" >"${omni_dir}/full-chain.pem"
 
 issuer_json="$(printf '%s' "$omni_auth_provider_url" | jq -Rs .)"
 redirect_json="$(printf '%s' "${omni_advertised_api_url%/}/oidc/consume" | jq -Rs .)"
@@ -151,11 +138,8 @@ printf '%s\n' \
   "    hash: ${password_hash_json}" \
   >"${omni_dir}/dex.yaml"
 
-printf '%s\n' \
-  "auth:" \
-  "  oidc:" \
-  "    clientSecret: ${client_secret_json}" \
-  >"${omni_dir}/omni.yaml"
+# Empty omni config - all configuration via command flags
+echo "" >"${omni_dir}/omni.yaml"
 
 chmod 0644 "${omni_dir}/ca.pem" "${omni_dir}/server-chain.pem"
 chmod 0600 "${omni_dir}/server-key.pem" "${omni_dir}/omni.asc" "${omni_dir}/dex.yaml" "${omni_dir}/omni.yaml"
@@ -173,7 +157,6 @@ http:
       entryPoints:
         - websecure
       service: omni
-      tls: {}
     omni-auth:
       rule: Host(\`${omni_auth_host}\`)
       entryPoints:
@@ -184,25 +167,15 @@ http:
       entryPoints:
         - websecure
       service: omni-auth
-      tls: {}
   services:
     omni:
       loadBalancer:
-        serversTransport: omni-insecure
         servers:
-          - url: https://host.docker.internal:8443
+          - url: https://omni:8443
     omni-auth:
       loadBalancer:
-        serversTransport: omni-insecure
         servers:
-          - url: https://host.docker.internal:5556
-  serversTransports:
-    omni-insecure:
-      insecureSkipVerify: true
-tls:
-  certificates:
-    - certFile: /etc/traefik/omni/server-chain.pem
-      keyFile: /etc/traefik/omni/server-key.pem
+          - url: https://dex:5556
 YAML
 chmod 0644 "${traefik_dynamic_dir}/omni.yml"
 
