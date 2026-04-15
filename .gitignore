@@ -33,6 +33,8 @@ sops.*
 .terraform.lock.hcl
 *.tfstate
 *.tfstate.*
+*.tfvars
+*.auto.tfvars
 crash.log
 override.tf
 override.tf.json

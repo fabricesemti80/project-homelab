@@ -61,7 +61,7 @@ services:
       - --siderolink-wireguard-bind-addr=${OMNI_SIDEROLINK_WIREGUARD_BIND_ADDR:-0.0.0.0:50180}
       - --siderolink-wireguard-advertised-addr=${OMNI_SIDEROLINK_WIREGUARD_ADVERTISED_ADDR:-omni.krapulax.dev:50180}
       - --auth-oidc-enabled=true
-      - --auth-oidc-provider-url=https://auth.krapulax.dev
+      - --auth-oidc-provider-url=${OMNI_AUTH_PROVIDER_URL}
       - --auth-oidc-client-id=omni
       - --auth-oidc-client-secret=${OMNI_DEX_CLIENT_SECRET}
       - --auth-oidc-scopes=openid,profile,email

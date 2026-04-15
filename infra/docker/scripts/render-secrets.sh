@@ -13,6 +13,7 @@ fi
 
 required_vars=(
   TAILSCALE_AUTH_KEY
+  CLOUDFLARED_TUNNEL_TOKEN
   OMNI_CA_CERT_PEM
   OMNI_TLS_CERT_PEM
   OMNI_TLS_KEY_PEM
@@ -25,6 +26,10 @@ required_vars=(
 )
 
 for var in "${required_vars[@]}"; do
+  # Optional vars
+  if [[ "$var" == "TAILSCALE_AUTH_KEY" || "$var" == "CLOUDFLARED_TUNNEL_TOKEN" ]]; then
+    continue
+  fi
   if [ -z "${!var:-}" ]; then
     printf '%s is not set; define it in .envrc before rendering Docker runtime secrets\n' "$var" >&2
     exit 1
@@ -91,14 +96,41 @@ write_dotenv() {
   chmod 0600 "$env_file"
 }
 tailscale_dir="${docker_root}/runtime/secrets/tailscale"
+cloudflared_dir="${docker_root}/runtime/secrets/cloudflared"
 omni_dir="${docker_root}/runtime/secrets/omni"
 traefik_dynamic_dir="${docker_root}/runtime/traefik/dynamic"
 
-mkdir -p "$tailscale_dir" "$omni_dir" "$traefik_dynamic_dir"
-chmod 700 "${docker_root}/runtime" "${docker_root}/runtime/secrets" "$tailscale_dir" "$omni_dir"
+mkdir -p "$tailscale_dir" "$cloudflared_dir" "$omni_dir" "$traefik_dynamic_dir"
+chmod 700 "${docker_root}/runtime" "${docker_root}/runtime/secrets" "$tailscale_dir" "$cloudflared_dir" "$omni_dir"
 
-printf '%s\n' "$TAILSCALE_AUTH_KEY" >"${tailscale_dir}/auth_key"
-chmod 0600 "${tailscale_dir}/auth_key"
+if [ -n "${TAILSCALE_AUTH_KEY:-}" ]; then
+  printf '%s\n' "$TAILSCALE_AUTH_KEY" >"${tailscale_dir}/auth_key"
+  chmod 0600 "${tailscale_dir}/auth_key"
+fi
+
+if [ -n "${CLOUDFLARED_TUNNEL_TOKEN:-}" ]; then
+  secret_file="$(mktemp)"
+  trap 'rm -f "$secret_file"' EXIT
+  printf '%s\n' "$CLOUDFLARED_TUNNEL_TOKEN" >"$secret_file"
+
+  if jq -e 'type == "object" and has("AccountTag") and has("TunnelSecret") and has("TunnelID")' "$secret_file" >/dev/null 2>&1; then
+    tunnel_id="$(jq -r '.TunnelID' "$secret_file")"
+    printf '%s\n' \
+      "tunnel: ${tunnel_id}" \
+      "credentials-file: /etc/cloudflared/credentials.json" \
+      "ingress:" \
+      "  - service: http://127.0.0.1:80" \
+      >"${cloudflared_dir}/config.yml"
+    install -m 0600 "$secret_file" "${cloudflared_dir}/credentials.json"
+  else
+    printf '%s\n' \
+      "ingress:" \
+      "  - service: http://127.0.0.1:80" \
+      >"${cloudflared_dir}/config.yml"
+    install -m 0600 "$secret_file" "${cloudflared_dir}/token"
+  fi
+  chmod 0600 "${cloudflared_dir}/config.yml"
+fi
 
 printf '%s\n' "$OMNI_CA_CERT_PEM" >"${omni_dir}/ca.pem"
 printf '%s\n%s\n' "$OMNI_TLS_CERT_PEM" "$OMNI_CA_CERT_PEM" >"${omni_dir}/server-chain.pem"
@@ -170,12 +202,17 @@ http:
   services:
     omni:
       loadBalancer:
+        serversTransport: omni-insecure
         servers:
           - url: https://omni:8443
     omni-auth:
       loadBalancer:
+        serversTransport: omni-insecure
         servers:
           - url: https://dex:5556
+  serversTransports:
+    omni-insecure:
+      insecureSkipVerify: true
 YAML
 chmod 0644 "${traefik_dynamic_dir}/omni.yml"
 

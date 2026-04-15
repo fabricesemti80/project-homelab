@@ -56,3 +56,18 @@ run = "bash infra/docker/scripts/deploy.sh"
 [tasks."docker:omni:envrc"]
 description = "Generate or rotate Omni certs, GPG key, Dex secret, and .envrc Omni block"
 run = "bash infra/docker/scripts/render-omni-envrc.sh"
+
+[tasks."tf:init"]
+description = "Initialize Terraform in infra/terraform"
+run = "terraform init"
+dir = "infra/terraform"
+
+[tasks."tf:plan"]
+description = "Plan Terraform infrastructure changes"
+run = "terraform plan"
+dir = "infra/terraform"
+
+[tasks."tf:apply"]
+description = "Apply Terraform infrastructure changes"
+run = "terraform apply -auto-approve"
+dir = "infra/terraform"
