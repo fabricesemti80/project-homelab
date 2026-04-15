@@ -27,7 +27,7 @@ required_vars=(
 
 for var in "${required_vars[@]}"; do
   # Optional vars
-  if [[ "$var" == "TAILSCALE_AUTH_KEY" || "$var" == "CLOUDFLARED_TUNNEL_TOKEN" ]]; then
+  if [[ $var == "TAILSCALE_AUTH_KEY" || $var == "CLOUDFLARED_TUNNEL_TOKEN" ]]; then
     continue
   fi
   if [ -z "${!var:-}" ]; then
@@ -42,7 +42,6 @@ omni_advertised_api_url="${OMNI_ADVERTISED_API_URL:-https://${omni_host}/}"
 omni_auth_provider_url="${OMNI_AUTH_PROVIDER_URL:-https://${omni_auth_host}}"
 omni_dex_username="${OMNI_DEX_USERNAME:-admin}"
 
-
 dotenv_quote() {
   printf "'"
   printf '%s' "$1" | sed "s/'/'\\''/g"
@@ -50,14 +49,14 @@ dotenv_quote() {
 }
 
 write_dotenv() {
-   local env_file="${docker_root}/.env"
-   local docker_root_value="${HOMELAB_DOCKER_ROOT:-}"
-   if [ -z "$docker_root_value" ]; then
-     docker_root_value="$docker_root"
-   fi
-   {
-     printf 'COMPOSE_PROJECT_NAME=%s\n' "$(dotenv_quote "${COMPOSE_PROJECT_NAME:-homelab}")"
-     printf 'HOMELAB_DOCKER_ROOT=%s\n' "$(dotenv_quote "$docker_root_value")"
+  local env_file="${docker_root}/.env"
+  local docker_root_value="${HOMELAB_DOCKER_ROOT:-}"
+  if [ -z "$docker_root_value" ]; then
+    docker_root_value="$docker_root"
+  fi
+  {
+    printf 'COMPOSE_PROJECT_NAME=%s\n' "$(dotenv_quote "${COMPOSE_PROJECT_NAME:-homelab}")"
+    printf 'HOMELAB_DOCKER_ROOT=%s\n' "$(dotenv_quote "$docker_root_value")"
     printf 'HOMELAB_DOCKER_PLATFORM=%s\n' "$(dotenv_quote "${HOMELAB_DOCKER_PLATFORM:-linux/amd64}")"
     [ -z "${COMPOSE_PROFILES:-}" ] || printf 'COMPOSE_PROFILES=%s\n' "$(dotenv_quote "$COMPOSE_PROFILES")"
     printf 'PUID=%s\n' "$(dotenv_quote "${PUID:-1000}")"
@@ -87,7 +86,7 @@ write_dotenv() {
     printf 'OMNI_KUBERNETES_PROXY_BIND_ADDR=%s\n' "$(dotenv_quote "${OMNI_KUBERNETES_PROXY_BIND_ADDR:-0.0.0.0:8100}")"
     printf 'OMNI_ADVERTISED_KUBERNETES_PROXY_URL=%s\n' "$(dotenv_quote "${OMNI_ADVERTISED_KUBERNETES_PROXY_URL:-https://${omni_host}:8100/}")"
     printf 'OMNI_EVENT_SINK_PORT=%s\n' "$(dotenv_quote "${OMNI_EVENT_SINK_PORT:-8091}")"
-  printf 'OMNI_DEX_CLIENT_SECRET=%s\n' "$(dotenv_quote "${OMNI_DEX_CLIENT_SECRET:-}")"
+    printf 'OMNI_DEX_CLIENT_SECRET=%s\n' "$(dotenv_quote "${OMNI_DEX_CLIENT_SECRET:-}")"
     printf 'OMNI_SIDEROLINK_WIREGUARD_BIND_ADDR=%s\n' "$(dotenv_quote "${OMNI_SIDEROLINK_WIREGUARD_BIND_ADDR:-0.0.0.0:50180}")"
     printf 'OMNI_SIDEROLINK_WIREGUARD_ADVERTISED_ADDR=%s\n' "$(dotenv_quote "${OMNI_SIDEROLINK_WIREGUARD_ADVERTISED_ADDR:-omni.krapulax.dev:50180}")"
     printf 'OMNI_AUTH_PROVIDER_URL=%s\n' "$(dotenv_quote "$omni_auth_provider_url")"

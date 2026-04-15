@@ -36,7 +36,7 @@ resource "cloudflare_zero_trust_access_policy" "allow_emails" {
   account_id = var.cloudflare_account_id
   name       = "Allow selected users"
   decision   = "allow"
-  
+
   include = [
     {
       email = {
@@ -52,7 +52,7 @@ resource "cloudflare_zero_trust_access_policy" "bypass" {
   account_id = var.cloudflare_account_id
   name       = "Bypass public service hostnames"
   decision   = "bypass"
-  
+
   include = [
     {
       everyone = {}
@@ -68,7 +68,7 @@ resource "cloudflare_zero_trust_access_application" "app" {
   name       = "Arcane"
   domain     = local.apps[each.key]
   type       = "self_hosted"
-  
+
   http_only_cookie_attribute = true
   session_duration           = "24h"
 
@@ -87,7 +87,7 @@ resource "cloudflare_zero_trust_access_application" "bypass_app" {
   name       = each.key == "beszel" ? "Beszel Bypass" : (each.key == "omni" ? "Omni Bypass" : "Omni Auth Bypass")
   domain     = local.apps[each.key]
   type       = "self_hosted"
-  
+
   http_only_cookie_attribute = true
   session_duration           = "24h"
 

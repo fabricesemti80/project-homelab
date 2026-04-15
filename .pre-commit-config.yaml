@@ -1,0 +1,55 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-json
+      - id: check-merge-conflict
+      - id: check-added-large-files
+      - id: detect-private-key
+
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.21.2
+    hooks:
+      - id: gitleaks
+
+  - repo: local
+    hooks:
+      - id: terraform-fmt
+        name: Terraform fmt
+        language: system
+        entry: mise exec -- terraform fmt -recursive
+        files: \.tf$
+        pass_filenames: false
+
+      - id: terraform-tflint
+        name: Terraform validate with tflint
+        language: system
+        entry: mise exec -- tflint --config=../../.tflint.hcl --chdir=infra/terraform
+        files: \.tf$
+        pass_filenames: false
+
+      - id: shfmt
+        name: shfmt
+        language: system
+        entry: mise exec -- shfmt -w -i 2 -s
+        types: [shell]
+
+  - repo: https://github.com/pre-commit/mirrors-prettier
+    rev: v3.1.0
+    hooks:
+      - id: prettier
+        types_or: [markdown, json, toml]
+
+  - repo: https://github.com/shellcheck-py/shellcheck-py
+    rev: v0.10.0.1
+    hooks:
+      - id: shellcheck
+
+  - repo: https://github.com/adrienverge/yamllint
+    rev: v1.35.1
+    hooks:
+      - id: yamllint
+        args: [-c, .yamllint]

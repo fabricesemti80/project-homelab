@@ -15,8 +15,3 @@ variable "cloudflare_zone_id" {
   type        = string
   sensitive   = true
 }
-
-variable "cloudflare_tunnel_id" {
-  description = "Existing Cloudflare Tunnel ID"
-  type        = string
-}

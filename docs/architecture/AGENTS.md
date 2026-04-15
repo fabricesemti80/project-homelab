@@ -1,9 +1,11 @@
 # AGENTS.md (docs/architecture scope)
 
 ## Scope
+
 Applies to everything under `docs/architecture/`.
 
 ## Documentation style
+
 - Keep documents decision-oriented and implementation-ready.
 - Use these sections when relevant:
   - Context
@@ -17,5 +19,6 @@ Applies to everything under `docs/architecture/`.
 - Include a clear "Next actions" checklist at the end of each plan.
 
 ## Change management
+
 - When replacing a previous architecture decision, add a short "Supersedes" note.
 - Keep entries concise and date-stamped when they represent decisions.

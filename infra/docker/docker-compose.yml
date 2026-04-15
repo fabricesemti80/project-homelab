@@ -11,4 +11,3 @@ include:
 networks:
   proxy:
     name: homelab_proxy
-

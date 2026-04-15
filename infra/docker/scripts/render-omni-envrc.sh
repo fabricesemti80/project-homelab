@@ -8,7 +8,7 @@ envrc="${repo_root}/.envrc"
 
 if [ -f "$envrc" ]; then
   set -a
-  # shellcheck disable=SC1091
+  # shellcheck disable=SC1090,SC1091
   . "$envrc"
   set +a
 fi
@@ -45,6 +45,7 @@ emit_scalar_export() {
 
 emit_multiline_export() {
   local name="$1" path="$2"
+  # shellcheck disable=SC2016
   printf 'export %s="$(cat <<'"'"'EOF_%s'"'"'\n' "$name" "$name"
   cat "$path"
   printf '\nEOF_%s\n)"\n' "$name"
@@ -113,7 +114,7 @@ DNS.1 = ${OMNI_ENDPOINT}
 DNS.2 = ${OMNI_AUTH_ENDPOINT}
 IP.1 = 127.0.0.1
 CONFIG
-  if [[ "$wireguard_host" =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+  if [[ $wireguard_host =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
     printf 'IP.2 = %s\n' "$wireguard_host" >>"$san_file"
   else
     printf 'DNS.3 = %s\n' "$wireguard_host" >>"$san_file"

@@ -8,7 +8,10 @@ required=(
 )
 
 for f in "${required[@]}"; do
-  [[ -f "$f" ]] || { echo "Missing required file: $f"; exit 1; }
+  [[ -f $f ]] || {
+    echo "Missing required file: $f"
+    exit 1
+  }
 done
 
 echo "Validation passed: required files present."

@@ -1,5 +1,12 @@
 [tools]
 # pin tooling versions as implementation progresses
+gitleaks = "latest"
+tflint = "latest"
+shellcheck = "latest"
+yamllint = "latest"
+terraform = "latest"
+shfmt = "latest"
+prettier = "latest"
 
 [tasks.validate]
 description = "Validate repository structure and required files"
@@ -70,4 +77,21 @@ dir = "infra/terraform"
 [tasks."tf:apply"]
 description = "Apply Terraform infrastructure changes"
 run = "terraform apply -auto-approve"
+dir = "infra/terraform"
+
+[tasks.lint]
+description = "Run all linters manually with auto-fixing where possible"
+run = "mise run tf:fmt && shfmt -w -i 2 -s scripts/*.sh infra/docker/scripts/*.sh && yamllint . && shellcheck scripts/*.sh infra/docker/scripts/*.sh"
+
+[tasks."pre-commit:install"]
+description = "Install pre-commit git hooks"
+run = "pre-commit install"
+
+[tasks."pre-commit:run"]
+description = "Run all pre-commit hooks against all files"
+run = "pre-commit run --all-files"
+
+[tasks."tf:fmt"]
+description = "Format all Terraform files"
+run = "terraform fmt -recursive"
 dir = "infra/terraform"
