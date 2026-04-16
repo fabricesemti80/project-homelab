@@ -126,17 +126,26 @@ require_cmd gpg
 mkdir -p "$out_dir"
 chmod 700 "$out_dir"
 
-openssl genrsa -out "${out_dir}/ca-key.pem" 4096
-openssl req -x509 -new -nodes -key "${out_dir}/ca-key.pem" -sha256 -days 3650 -out "${out_dir}/ca.pem" -subj "/C=GB/O=Home Infrastructure/OU=Omni/CN=Internal Root CA"
-write_cert_config "${out_dir}/server-openssl.cnf"
-openssl genrsa -out "${out_dir}/server-key.pem" 4096
-openssl req -new -key "${out_dir}/server-key.pem" -out "${out_dir}/server.csr" -config "${out_dir}/server-openssl.cnf"
-openssl x509 -req -in "${out_dir}/server.csr" -CA "${out_dir}/ca.pem" -CAkey "${out_dir}/ca-key.pem" -CAcreateserial -out "${out_dir}/server.pem" -days 825 -sha256 -extfile "${out_dir}/server-openssl.cnf" -extensions san
+if [ -f "${out_dir}/ca.pem" ] && [ -f "${out_dir}/server.pem" ]; then
+  printf 'Existing TLS certs found - skipping regeneration.\n'
+else
+  openssl genrsa -out "${out_dir}/ca-key.pem" 4096
+  openssl req -x509 -new -nodes -key "${out_dir}/ca-key.pem" -sha256 -days 3650 -out "${out_dir}/ca.pem" -subj "/C=GB/O=Home Infrastructure/OU=Omni/CN=Internal Root CA"
+  write_cert_config "${out_dir}/server-openssl.cnf"
+  openssl genrsa -out "${out_dir}/server-key.pem" 4096
+  openssl req -new -key "${out_dir}/server-key.pem" -out "${out_dir}/server.csr" -config "${out_dir}/server-openssl.cnf"
+  openssl x509 -req -in "${out_dir}/server.csr" -CA "${out_dir}/ca.pem" -CAkey "${out_dir}/ca-key.pem" -CAcreateserial -out "${out_dir}/server.pem" -days 825 -sha256 -extfile "${out_dir}/server-openssl.cnf" -extensions san
+fi
 
-rm -rf "$gnupg_home"
-mkdir -p "$gnupg_home"
-chmod 700 "$gnupg_home"
-cat >"${out_dir}/gpg-batch" <<'GPG'
+existing_key_warning="false"
+
+if [ -f "${out_dir}/omni.asc" ]; then
+  existing_key_warning="true"
+else
+  rm -rf "$gnupg_home"
+  mkdir -p "$gnupg_home"
+  chmod 700 "$gnupg_home"
+  cat >"${out_dir}/gpg-batch" <<'GPG'
 Key-Type: RSA
 Key-Length: 4096
 Name-Real: Omni
@@ -146,8 +155,9 @@ Expire-Date: 0
 %no-protection
 %commit
 GPG
-gpg --homedir "$gnupg_home" --batch --generate-key "${out_dir}/gpg-batch"
-gpg --homedir "$gnupg_home" --armor --export-secret-keys omni@internal.local >"${out_dir}/omni.asc"
+  gpg --homedir "$gnupg_home" --batch --generate-key "${out_dir}/gpg-batch"
+  gpg --homedir "$gnupg_home" --armor --export-secret-keys omni@internal.local >"${out_dir}/omni.asc"
+fi
 
 OMNI_DEX_CLIENT_SECRET="$(openssl rand -hex 32)"
 admin_password="$(prompt_password)"
@@ -191,4 +201,10 @@ fi
 } >"$envrc"
 rm -f "$tmp"
 chmod 600 "${out_dir}/ca-key.pem" "${out_dir}/server-key.pem" "${out_dir}/omni.asc"
-printf 'Updated %s and generated Omni secret files under %s\n' "$envrc" "$out_dir"
+if [ "$existing_key_warning" = "true" ]; then
+  printf 'WARNING: Existing omni.asc found - GPG key was NOT regenerated.\n'
+  printf 'If you need to rotate the GPG key, you MUST manually remove %s/omni.asc first AND clear the etcd volume (docker volume rm homelab_omni_etcd_data).\n' "$out_dir"
+  printf 'Updated %s and reused existing Omni secret files under %s\n' "$envrc" "$out_dir"
+else
+  printf 'Updated %s and generated Omni secret files under %s\n' "$envrc" "$out_dir"
+fi
