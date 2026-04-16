@@ -32,9 +32,7 @@ This repository is also the main deployment home for the Talos cluster and the h
 - Use `mise run docker:deploy` for local or remote Docker deployment.
 - Remote deployment is controlled by `HOMELAB_DOCKER_HOST` and `HOMELAB_DOCKER_REMOTE_DIR` from `.envrc`.
 - Prefer remote SSH deployment over assuming the host is NixOS-specific.
-- Omni secrets are rendered from `.envrc` into `infra/docker/runtime/secrets/omni`; do not hand-edit generated runtime files.
-- Use `mise run docker:omni:envrc` only when intentionally rotating Omni CA/certs/GPG/Dex credentials.
-- Omni currently uses host networking for SideroLink/WireGuard; do not move it to Docker bridge networking without validating Talos node connectivity.
+- Omni is intentionally not part of the Docker deployment; use Terraform/Talos-native flows for cluster provisioning.
 
 ## Definition of done (for infra tasks)
 

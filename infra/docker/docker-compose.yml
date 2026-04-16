@@ -6,8 +6,6 @@ include:
   - ./arcane/compose.yml
   - ./beszel/compose.yml
   - ./whoami/compose.yml
-  - ./omni/compose.yml
-  - ./omni-proxmox/compose.yml
 
 networks:
   proxy:

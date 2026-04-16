@@ -9,7 +9,7 @@ This repository is the central source of truth for a personal homelab overhaul. 
 The project is structured into four distinct phases:
 
 1.  **🚀 Phase 1: Mini-Docker Layer**
-    A transportable Docker stack providing core management and remote access (Omni, Traefik, Cloudflared, Beszel, Arcane).
+    A transportable Docker stack providing core routing, remote access, monitoring, and admin utilities (Traefik, Cloudflared, Beszel, Arcane).
 2.  **🌌 Phase 2: Talos Cluster**
     Provisioning a highly available 3-node Kubernetes cluster on Proxmox using immutable Talos Linux.
 3.  **📡 Phase 3: Networking & Storage**

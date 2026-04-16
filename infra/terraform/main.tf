@@ -10,11 +10,9 @@ resource "cloudflare_zero_trust_tunnel_cloudflared" "trinity" {
 # DNS Records
 locals {
   apps = {
-    "arcane"    = "arcane.krapulax.dev"
-    "beszel"    = "beszel.krapulax.dev"
-    "omni"      = "omni.krapulax.dev"
-    "omni_auth" = "auth.krapulax.dev"
-    "whoami"    = "whoami.krapulax.dev"
+    "arcane" = "arcane.krapulax.dev"
+    "beszel" = "beszel.krapulax.dev"
+    "whoami" = "whoami.krapulax.dev"
   }
 }
 
@@ -81,10 +79,10 @@ resource "cloudflare_zero_trust_access_application" "app" {
 }
 
 resource "cloudflare_zero_trust_access_application" "bypass_app" {
-  for_each = toset(["beszel", "omni", "omni_auth"])
+  for_each = toset(["beszel"])
 
   account_id = var.cloudflare_account_id
-  name       = each.key == "beszel" ? "Beszel Bypass" : (each.key == "omni" ? "Omni Bypass" : "Omni Auth Bypass")
+  name       = "Beszel Bypass"
   domain     = local.apps[each.key]
   type       = "self_hosted"
 

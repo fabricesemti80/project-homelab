@@ -1,5 +1,0 @@
-# Proxmox Provider Configuration
-# Secrets are provided via environment variables in compose.yml
-proxmox:
-  endpoint: "https://10.0.40.10:8006/api2/json"
-  insecure: true

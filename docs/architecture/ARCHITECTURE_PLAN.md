@@ -125,7 +125,7 @@ The design phase is complete when:
 - NAS is available and exports **NFS shares**.
 - You already have **Tailscale** and **Cloudflare** accounts.
 - Kubernetes should run on **Talos Linux** and be automated as much as possible.
-- VM provisioning should use **omni-infra-provider-proxmox** if feasible.
+- VM provisioning should use Terraform plus Talos-native bootstrap workflows; Omni is out of scope for the active deployment.
 - GitOps control plane should be **Argo CD**.
 - Initial access model is **private-only via Tailscale**; Cloudflare exposure can come later.
 - NFS should be used for long-term media retention.
@@ -196,7 +196,7 @@ Suggested task groups:
 
 ## 4.2 IaC and config ownership
 
-- Proxmox VM provisioning: omni-infra-provider-proxmox workflow.
+- Proxmox VM provisioning: Terraform-managed VM creation plus Talos-native bootstrap.
 - Cluster OS + control-plane config: Talos machine configs in Git.
 - Add-ons and apps: Argo CD app-of-apps or ApplicationSet pattern.
 - Secrets: SOPS + age (or equivalent) before production workloads.
@@ -281,7 +281,7 @@ Suggested task groups:
 
 ## 8) Decisions to confirm
 
-1. **Talos provisioning path**: Do you want Omni directly, or Talos + Terraform alternative if provider gaps appear?
+1. **Talos provisioning path**: Terraform-managed VMs plus Talos-native bootstrap; Omni is intentionally excluded.
 2. **CNI preference**: Cilium vs. another CNI (Cilium recommended if no blocker).
 3. **Ingress choice**: Traefik vs NGINX (you mentioned Traefik familiarity).
 4. **Longhorn disks**: Dedicated virtual disks per worker available?
@@ -341,7 +341,7 @@ Please answer these to lock Phase 0/1:
 
 - Tailscale and Cloudflare accounts are ready.
 - Desired cluster OS: **Talos Linux**.
-- Preferred VM provisioning path: **omni-infra-provider-proxmox** (if practical).
+- Preferred VM provisioning path: **Terraform-managed Proxmox VMs plus Talos-native bootstrap**.
 - GitOps controller: **Argo CD**.
 - Initial exposure model: **private-only over Tailscale**.
 - Cloudflare tunnels/DNS are deferred to later phase.

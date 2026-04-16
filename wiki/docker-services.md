@@ -23,7 +23,7 @@ Stored under `infra/docker/`, this tier is completely containerized inside a `do
 5. **Arcane**
    Internal secrets and artifact management utility.
 
-(Sidero Omni and related plugins are handled dynamically alongside these via external Compose merges).
+Omni and its Proxmox provider are intentionally not part of this Docker tier.
 
 ## Operations & Environment Mapping
 
@@ -32,6 +32,6 @@ Secrets never live in GitHub. The entire Docker hierarchy relies heavily on `dir
 When invoking `mise run docker:deploy`:
 
 1. `render-secrets.sh` parses `.envrc` directly.
-2. It generates scoped file mappings (`.env`, `tls-chain.pem`, `omni.asc`) directly to an un-tracked `runtime/` folder.
+2. It generates scoped file mappings and the Compose `.env` directly to an un-tracked `runtime/` folder.
 3. It securely performs an `rsync` push to the Proxmox target node over SSH.
 4. It triggers a `docker compose up -d` against the synchronized configurations to execute idempotently.

@@ -27,8 +27,6 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - ${HOMELAB_DOCKER_ROOT:-.}/runtime/traefik/dynamic:/etc/traefik/dynamic:ro
-      - ${HOMELAB_DOCKER_ROOT:-.}/runtime/secrets/omni/server-chain.pem:/etc/traefik/omni/server-chain.pem:ro
-      - ${HOMELAB_DOCKER_ROOT:-.}/runtime/secrets/omni/server-key.pem:/etc/traefik/omni/server-key.pem:ro
     networks:
       - proxy
 
