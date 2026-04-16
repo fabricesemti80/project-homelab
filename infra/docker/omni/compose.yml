@@ -37,6 +37,8 @@ services:
       - proxy
     ports:
       - "50180:50180/udp"
+      - "8443:8443"
+      - "8095:8095"
     cap_add:
       - NET_ADMIN
     devices:

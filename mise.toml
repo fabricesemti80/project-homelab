@@ -65,6 +65,10 @@ run = "bash infra/docker/scripts/deploy.sh"
 description = "Generate or rotate Omni certs, GPG key, Dex secret, and .envrc Omni block"
 run = "bash infra/docker/scripts/render-omni-envrc.sh"
 
+[tasks."omni:config"]
+description = "Configure omnictl to connect directly to Omni (skip Cloudflare gRPC blocking)"
+run = "bash -c 'mkdir -p ~/.talos/keys && omnictl config url https://10.0.40.61:8443'"
+
 [tasks."tf:init"]
 description = "Initialize Terraform in infra/terraform"
 run = "terraform init"
