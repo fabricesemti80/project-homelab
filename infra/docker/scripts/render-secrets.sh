@@ -61,6 +61,7 @@ write_dotenv() {
     printf 'BESZEL_AGENT_HUB_URL=%s\n' "$(dotenv_quote "${BESZEL_AGENT_HUB_URL:-http://localhost:8090}")"
     printf 'BESZEL_AGENT_KEY=%s\n' "$(dotenv_quote "${BESZEL_AGENT_KEY:-}")"
     printf 'BESZEL_AGENT_TOKEN=%s\n' "$(dotenv_quote "${BESZEL_AGENT_TOKEN:-}")"
+    printf 'UPTIME_KUMA_HOSTNAME=%s\n' "$(dotenv_quote "${UPTIME_KUMA_HOSTNAME:-uptime.krapulax.dev}")"
     printf 'WHOAMI_HOSTNAME=%s\n' "$(dotenv_quote "${WHOAMI_HOSTNAME:-whoami.krapulax.dev}")"
 
   } >"$env_file"

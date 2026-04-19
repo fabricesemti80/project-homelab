@@ -12,6 +12,7 @@ locals {
   apps = {
     "arcane" = "arcane.krapulax.dev"
     "beszel" = "beszel.krapulax.dev"
+    "uptime" = "uptime.krapulax.dev"
     "whoami" = "whoami.krapulax.dev"
   }
 }
@@ -60,10 +61,10 @@ resource "cloudflare_zero_trust_access_policy" "bypass" {
 
 # Access Applications (Referencing policies in v5)
 resource "cloudflare_zero_trust_access_application" "app" {
-  for_each = toset(["arcane"])
+  for_each = toset(["arcane", "uptime"])
 
   account_id = var.cloudflare_account_id
-  name       = "Arcane"
+  name       = each.key == "arcane" ? "Arcane" : "Uptime Kuma"
   domain     = local.apps[each.key]
   type       = "self_hosted"
 

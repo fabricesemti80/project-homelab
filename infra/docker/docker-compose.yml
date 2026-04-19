@@ -5,6 +5,7 @@ include:
   - ./cloudflared/compose.yml
   - ./arcane/compose.yml
   - ./beszel/compose.yml
+  - ./uptime-kuma/compose.yml
   - ./whoami/compose.yml
 
 networks:

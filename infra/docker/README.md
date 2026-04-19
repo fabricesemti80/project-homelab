@@ -6,7 +6,7 @@ It is intentionally plain Docker Compose so it can run on non-Nix machines.
 ## Layout
 
 - `docker-compose.yml`: main Compose entrypoint. It includes each service-specific Compose file.
-- `arcane/`, `beszel/`, `cloudflared/`, `traefik/`, `whoami/`: one directory per service group.
+- `arcane/`, `beszel/`, `cloudflared/`, `traefik/`, `uptime-kuma/`, `whoami/`: one directory per service group.
 - `scripts/render-secrets.sh`: renders ignored runtime files from the repository root `.envrc`.
 - `scripts/deploy.sh`: renders runtime files and deploys either locally or to a remote Docker server.
 - `runtime/`: generated config and secret mounts consumed by Compose. Ignored by Git.

@@ -20,7 +20,10 @@ Stored under `infra/docker/`, this tier is completely containerized inside a `do
 4. **WhoAmI**
    A testing endpoint for confirming Traefik HTTP headers, network mappings, and general resolution validation during bring-up.
 
-5. **Arcane**
+5. **Uptime Kuma**
+   Service-level uptime monitoring for public and internal endpoints, complementing Beszel's infrastructure metrics.
+
+6. **Arcane**
    Internal secrets and artifact management utility.
 
 Omni and its Proxmox provider are intentionally not part of this Docker tier.
