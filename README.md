@@ -38,7 +38,7 @@ Ensure you have `mise` installed on your system.
 mise install
 
 # Deploy host-level Docker stack
-mise run docker:deploy
+mise run stack:deploy
 
 # Plan Terraform changes
 mise run tf:plan

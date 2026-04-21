@@ -24,14 +24,13 @@ This repository is also the main deployment home for the Talos cluster and the h
 - Each Docker service should have its own subdirectory and be included from `infra/docker/docker-compose.yml`.
 - Rendered Docker runtime config belongs in `infra/docker/runtime/` and must remain ignored.
 - Local source secret material belongs in `infra/docker/secrets/` and must remain ignored.
-- The root `.envrc` is the local source for Docker deployment secrets and deployment target variables.
+- The root `.envrc` is the local source for Docker deployment secrets.
 
 ## Docker Deployment Rules
 
-- Use `mise run docker:render` before validating Compose config.
-- Use `mise run docker:deploy` for local or remote Docker deployment.
-- Remote deployment is controlled by `HOMELAB_DOCKER_HOST` and `HOMELAB_DOCKER_REMOTE_DIR` from `.envrc`.
-- Prefer remote SSH deployment over assuming the host is NixOS-specific.
+- Use `mise run stack:render` before validating Compose config.
+- Use `mise run stack:deploy` from the Docker host checkout to start or update the stack.
+- Keep Docker stack deployment as a simple local Compose operation; do not bake SSH sync into the deploy task.
 - Omni is intentionally not part of the Docker deployment; use Terraform/Talos-native flows for cluster provisioning.
 
 ## Definition of done (for infra tasks)

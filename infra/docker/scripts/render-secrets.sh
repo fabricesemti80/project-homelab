@@ -39,7 +39,7 @@ write_dotenv() {
   local env_file="${docker_root}/.env"
   local docker_root_value="${HOMELAB_DOCKER_ROOT:-}"
   if [ -z "$docker_root_value" ]; then
-    docker_root_value="$docker_root"
+    docker_root_value="."
   fi
   {
     printf 'COMPOSE_PROJECT_NAME=%s\n' "$(dotenv_quote "${COMPOSE_PROJECT_NAME:-homelab}")"
@@ -58,9 +58,7 @@ write_dotenv() {
     printf 'ARCANE_JWT_SECRET=%s\n' "$(dotenv_quote "$ARCANE_JWT_SECRET")"
     printf 'BESZEL_HOSTNAME=%s\n' "$(dotenv_quote "${BESZEL_HOSTNAME:-beszel.krapulax.dev}")"
     printf 'BESZEL_APP_URL=%s\n' "$(dotenv_quote "${BESZEL_APP_URL:-https://beszel.krapulax.dev}")"
-    printf 'BESZEL_AGENT_HUB_URL=%s\n' "$(dotenv_quote "${BESZEL_AGENT_HUB_URL:-http://localhost:8090}")"
     printf 'BESZEL_AGENT_KEY=%s\n' "$(dotenv_quote "${BESZEL_AGENT_KEY:-}")"
-    printf 'BESZEL_AGENT_TOKEN=%s\n' "$(dotenv_quote "${BESZEL_AGENT_TOKEN:-}")"
     printf 'UPTIME_KUMA_HOSTNAME=%s\n' "$(dotenv_quote "${UPTIME_KUMA_HOSTNAME:-uptime.krapulax.dev}")"
     printf 'WHOAMI_HOSTNAME=%s\n' "$(dotenv_quote "${WHOAMI_HOSTNAME:-whoami.krapulax.dev}")"
 
@@ -74,7 +72,7 @@ traefik_dynamic_dir="${docker_root}/runtime/traefik/dynamic"
 mkdir -p "$tailscale_dir" "$cloudflared_dir" "$traefik_dynamic_dir"
 chmod 700 "${docker_root}/runtime" "${docker_root}/runtime/secrets" "$tailscale_dir" "$cloudflared_dir"
 
-# Remove generated files from the retired Omni deployment so rsync-based deploys
+# Remove generated files from the retired Omni deployment so local Compose runs
 # do not keep publishing stale Traefik routes or secret mounts.
 rm -f "${traefik_dynamic_dir}/omni.yml"
 rm -rf "${docker_root}/runtime/secrets/omni"

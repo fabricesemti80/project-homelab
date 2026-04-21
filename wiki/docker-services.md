@@ -4,7 +4,7 @@ Before the Talos Kubernetes cluster can be fully managed, a host-level foundatio
 
 ## The Docker Stack
 
-Stored under `infra/docker/`, this tier is completely containerized inside a `docker-compose.yml` payload, which is pushed securely via SSH deployment scripts on demand (`mise run docker:deploy`).
+Stored under `infra/docker/`, this tier is completely containerized inside a `docker-compose.yml` payload and started from the Docker host checkout on demand (`mise run stack:deploy`).
 
 ### Core Services
 
@@ -32,9 +32,8 @@ Omni and its Proxmox provider are intentionally not part of this Docker tier.
 
 Secrets never live in GitHub. The entire Docker hierarchy relies heavily on `direnv` pulling variables from an `.envrc` context natively.
 
-When invoking `mise run docker:deploy`:
+When invoking `mise run stack:deploy`:
 
 1. `render-secrets.sh` parses `.envrc` directly.
 2. It generates scoped file mappings and the Compose `.env` directly to an un-tracked `runtime/` folder.
-3. It securely performs an `rsync` push to the Proxmox target node over SSH.
-4. It triggers a `docker compose up -d` against the synchronized configurations to execute idempotently.
+3. It triggers a local `docker compose up -d` against the rendered configuration to execute idempotently.

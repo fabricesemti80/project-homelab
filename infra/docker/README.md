@@ -8,7 +8,7 @@ It is intentionally plain Docker Compose so it can run on non-Nix machines.
 - `docker-compose.yml`: main Compose entrypoint. It includes each service-specific Compose file.
 - `arcane/`, `beszel/`, `cloudflared/`, `traefik/`, `uptime-kuma/`, `whoami/`: one directory per service group.
 - `scripts/render-secrets.sh`: renders ignored runtime files from the repository root `.envrc`.
-- `scripts/deploy.sh`: renders runtime files and deploys either locally or to a remote Docker server.
+- `scripts/deploy.sh`: renders runtime files and starts the local Docker Compose stack.
 - `runtime/`: generated config and secret mounts consumed by Compose. Ignored by Git.
 - `secrets/`: local source secret material. Ignored by Git.
 
@@ -22,21 +22,13 @@ The root `.envrc` is local and ignored. It must provide:
 
 ## Deploy
 
-Local Docker host:
+Render runtime files and start the stack from this checkout:
 
 ```sh
-mise run docker:deploy
+mise run stack:deploy
 ```
 
-Remote Docker host:
-
-```sh
-export HOMELAB_DOCKER_HOST=fs@10.0.40.19
-export HOMELAB_DOCKER_REMOTE_DIR=/opt/project-homelab/infra/docker
-mise run docker:deploy
-```
-
-The deploy script renders `runtime/` and `infra/docker/.env`, copies this Docker bundle to the remote host over SSH without copying local source `secrets/`, then runs:
+The deploy script renders `runtime/` and `infra/docker/.env`, then runs:
 
 ```sh
 docker compose -f docker-compose.yml up -d --remove-orphans
@@ -44,12 +36,16 @@ docker compose -f docker-compose.yml up -d --remove-orphans
 
 ## Beszel Agent
 
-The Beszel agent is behind the `agent` Compose profile. Enable it only when `BESZEL_AGENT_KEY` and `BESZEL_AGENT_TOKEN` are set:
+The Beszel agent is behind the `agent` Compose profile and is configured to monitor the Docker host itself over a local Unix socket.
+Enable it only when `BESZEL_AGENT_KEY` is set:
 
 ```sh
 export COMPOSE_PROFILES=agent
-mise run docker:deploy
+mise run stack:deploy
 ```
+
+In the Beszel Hub, add the host system with `/beszel_socket/beszel.sock` as the Host / IP.
+`BESZEL_AGENT_KEY` is the Hub public key shown when adding the system.
 
 ## Rollback
 

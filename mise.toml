@@ -48,16 +48,16 @@ run = "bash scripts/platform_observability.sh"
 description = "Run post-bootstrap verification checks"
 run = "bash scripts/verify_cluster.sh"
 
-[tasks."docker:render"]
+[tasks."stack:render"]
 description = "Render Docker runtime files from .envrc"
 run = "bash infra/docker/scripts/render-secrets.sh"
 
-[tasks."docker:config"]
+[tasks."stack:config"]
 description = "Render and validate Docker Compose configuration"
 run = "bash infra/docker/scripts/render-secrets.sh && docker compose --project-directory infra/docker -f infra/docker/docker-compose.yml config --quiet"
 
-[tasks."docker:deploy"]
-description = "Deploy host-level Docker services locally or to HOMELAB_DOCKER_HOST"
+[tasks."stack:deploy"]
+description = "Render runtime files and start the host-level Docker Compose stack"
 run = "bash infra/docker/scripts/deploy.sh"
 
 [tasks."tf:init"]
