@@ -31,12 +31,12 @@ mise run docker:deploy
 Remote Docker host:
 
 ```sh
-export HOMELAB_DOCKER_HOST=fs@10.0.40.61
+export HOMELAB_DOCKER_HOST=fs@10.0.40.19
 export HOMELAB_DOCKER_REMOTE_DIR=/opt/project-homelab/infra/docker
 mise run docker:deploy
 ```
 
-The deploy script renders `runtime/` and `infra/docker/.env`, copies this Docker bundle to the remote host over SSH, then runs:
+The deploy script renders `runtime/` and `infra/docker/.env`, copies this Docker bundle to the remote host over SSH without copying local source `secrets/`, then runs:
 
 ```sh
 docker compose -f docker-compose.yml up -d --remove-orphans

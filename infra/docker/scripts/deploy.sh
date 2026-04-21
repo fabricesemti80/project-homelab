@@ -3,12 +3,20 @@ set -euo pipefail
 
 repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd)"
 
+env_remote_host="${HOMELAB_DOCKER_HOST:-}"
+env_remote_dir="${HOMELAB_DOCKER_REMOTE_DIR:-}"
+env_remote_compose="${HOMELAB_DOCKER_REMOTE_COMPOSE:-}"
+
 if [ -f "${repo_root}/.envrc" ]; then
   set -a
   # shellcheck disable=SC1091
   . "${repo_root}/.envrc"
   set +a
 fi
+
+[ -z "$env_remote_host" ] || HOMELAB_DOCKER_HOST="$env_remote_host"
+[ -z "$env_remote_dir" ] || HOMELAB_DOCKER_REMOTE_DIR="$env_remote_dir"
+[ -z "$env_remote_compose" ] || HOMELAB_DOCKER_REMOTE_COMPOSE="$env_remote_compose"
 
 docker_root="${repo_root}/infra/docker"
 compose_file="${docker_root}/docker-compose.yml"
@@ -34,7 +42,7 @@ remote_base="$(basename "$remote_dir")"
 ssh "$remote_host" "mkdir -p '$remote_dir' 2>/dev/null || { sudo mkdir -p '$remote_dir' && sudo chown -R \"\$(id -u):\$(id -g)\" '$remote_parent'; }"
 
 # Sync all docker service definitions
-rsync -avz --exclude '.DS_Store' --exclude '._*' --exclude 'runtime' \
+rsync -avz --exclude '.DS_Store' --exclude '._*' --exclude 'runtime' --exclude 'secrets' \
   "$docker_root/" "$remote_host:$remote_dir/"
 
 # Sync runtime files without deleting the parent directory (which breaks bind mounts)
