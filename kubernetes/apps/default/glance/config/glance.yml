@@ -51,7 +51,9 @@ pages:
                   #   url: https://radarr.${DOMAIN}
       - size: small
         widgets:
-          - type: hacker-news
-            limit: 10
           - type: reddit
             subreddit: technology
+      - size: small
+        widgets:
+          - type: hacker-news
+            limit: 10
