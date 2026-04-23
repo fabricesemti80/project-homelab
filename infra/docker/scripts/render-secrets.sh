@@ -4,13 +4,6 @@ set -euo pipefail
 repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd)"
 docker_root="${repo_root}/infra/docker"
 
-if [ -f "${repo_root}/.envrc" ]; then
-  set -a
-  # shellcheck disable=SC1091
-  . "${repo_root}/.envrc"
-  set +a
-fi
-
 required_vars=(
   TAILSCALE_AUTH_KEY
   CLOUDFLARED_TUNNEL_TOKEN
@@ -24,7 +17,7 @@ for var in "${required_vars[@]}"; do
     continue
   fi
   if [ -z "${!var:-}" ]; then
-    printf '%s is not set; define it in .envrc before rendering Docker runtime secrets\n' "$var" >&2
+    printf '%s is not set; inject it via Doppler or the shell environment before rendering Docker runtime secrets\n' "$var" >&2
     exit 1
   fi
 done

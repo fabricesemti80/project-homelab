@@ -98,16 +98,16 @@ run = [
 ]
 
 [tasks."stack:render"]
-description = "Render Docker runtime files from .envrc"
-run = "bash infra/docker/scripts/render-secrets.sh"
+description = "Render Docker runtime files from Doppler-managed secrets"
+run = "doppler run --project project-homelab --config dev_homelab -- bash infra/docker/scripts/render-secrets.sh"
 
 [tasks."stack:config"]
-description = "Render and validate Docker Compose configuration"
-run = "bash infra/docker/scripts/render-secrets.sh && docker compose --project-directory infra/docker -f infra/docker/docker-compose.yml config --quiet"
+description = "Render and validate Docker Compose configuration using Doppler-managed secrets"
+run = "doppler run --project project-homelab --config dev_homelab -- sh -lc 'bash infra/docker/scripts/render-secrets.sh && docker compose --project-directory infra/docker -f infra/docker/docker-compose.yml config --quiet'"
 
 [tasks."stack:deploy"]
-description = "Render runtime files and start the host-level Docker Compose stack"
-run = "bash infra/docker/scripts/deploy.sh"
+description = "Render runtime files and start the host-level Docker Compose stack using Doppler-managed secrets"
+run = "doppler run --project project-homelab --config dev_homelab -- bash infra/docker/scripts/deploy.sh"
 
 [tasks."tf:init"]
 description = "Initialize both root OpenTofu stacks"

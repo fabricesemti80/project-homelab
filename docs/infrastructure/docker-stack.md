@@ -29,7 +29,8 @@ mise run stack:deploy
 
 ## Secrets and Runtime Files
 
--   `.envrc` is the local source for Docker deployment secrets
+-   Doppler is the source of Docker deployment secrets for this repo
+-   active Docker secret scope: `project-homelab / dev_homelab`
 -   rendered runtime files are written to `infra/docker/runtime/`
 -   local secret material belongs under `infra/docker/secrets/`
 -   these runtime and secret paths stay out of Git

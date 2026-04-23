@@ -7,8 +7,8 @@ MGMT_HOST="${MGMT_HOST:-fs@10.0.40.100}"
 SSH_IDENTITY_FILE="${SSH_IDENTITY_FILE:-}"
 REPO_URL="${REPO_URL:-https://github.com/fabricesemti80/project-homelab.git}"
 REPO_DIR="${REPO_DIR:-/home/fs/repos/project-homelab}"
-DOPPLER_PROJECT="${DOPPLER_PROJECT:-project-dockerlab}"
-DOPPLER_CONFIG="${DOPPLER_CONFIG:-dev}"
+DOPPLER_PROJECT="${DOPPLER_PROJECT:-project-homelab}"
+DOPPLER_CONFIG="${DOPPLER_CONFIG:-dev_homelab}"
 ROOT_DIR="$(cd "$(dirname "${0}")/.." && pwd)"
 
 function ssh_run() {

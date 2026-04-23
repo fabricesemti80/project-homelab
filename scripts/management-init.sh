@@ -6,8 +6,8 @@ source "$(dirname "${0}")/lib/common.sh"
 TARGET_USER="${TARGET_USER:-${SUDO_USER:-${USER}}}"
 TARGET_HOME="$(eval echo "~${TARGET_USER}")"
 REPO_DIR="${REPO_DIR:-${TARGET_HOME}/repos/project-homelab}"
-DOPPLER_PROJECT="${DOPPLER_PROJECT:-project-dockerlab}"
-DOPPLER_CONFIG="${DOPPLER_CONFIG:-dev}"
+DOPPLER_PROJECT="${DOPPLER_PROJECT:-project-homelab}"
+DOPPLER_CONFIG="${DOPPLER_CONFIG:-dev_homelab}"
 
 function as_target_user() {
   sudo -u "${TARGET_USER}" env "$@"

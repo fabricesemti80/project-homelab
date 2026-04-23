@@ -80,7 +80,7 @@ tasks:
 
   render-configs:
     internal: true
-    cmd: doppler run --project home-argo-cluster-2025 --config dev -- makejinja
+    cmd: doppler run --project project-homelab --config dev_homelab -- makejinja
     env:
       PYTHONDONTWRITEBYTECODE: '1'
     preconditions:

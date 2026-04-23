@@ -40,8 +40,8 @@ provider "doppler" {
 # Fetch Cloudflare configuration from Doppler
 data "doppler_secrets" "cloudflare" {
   count   = var.doppler_token != "" ? 1 : 0
-  config  = "dev"
-  project = "home-argo-cluster-2025"
+  config  = "dev_homelab"
+  project = "project-homelab"
 }
 
 locals {
@@ -90,8 +90,8 @@ resource "local_file" "credentials" {
 
 resource "doppler_secret" "tunnel_credentials" {
   count      = var.doppler_token != "" ? 1 : 0
-  config     = "dev"
-  project    = "home-argo-cluster-2025"
+  config     = "dev_homelab"
+  project    = "project-homelab"
   name       = "TUNNEL_CREDENTIALS"
   value      = local.credentials_json
   value_type = "json"
@@ -99,16 +99,16 @@ resource "doppler_secret" "tunnel_credentials" {
 
 resource "doppler_secret" "tunnel_id" {
   count   = var.doppler_token != "" ? 1 : 0
-  config  = "dev"
-  project = "home-argo-cluster-2025"
+  config  = "dev_homelab"
+  project = "project-homelab"
   name    = "TUNNEL_ID"
   value   = local.tunnel_id
 }
 
 resource "doppler_secret" "tunnel_token" {
   count   = var.doppler_token != "" ? 1 : 0
-  config  = "dev"
-  project = "home-argo-cluster-2025"
+  config  = "dev_homelab"
+  project = "project-homelab"
   name    = "TUNNEL_TOKEN"
   value   = local.tunnel_token
 }
