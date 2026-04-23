@@ -1,0 +1,62 @@
+theme:
+  background-color: "225 14% 15%"
+  primary-color: "157 47% 65%"
+  contrast-multiplier: 1.1
+
+pages:
+  - name: Dashboard
+    columns:
+      - size: small
+        widgets:
+          - type: clock
+            time-format: "15:04"
+          - type: calendar
+          - type: weather
+            location: London, United Kingdom
+      - size: full
+        widgets:
+          - type: search
+          - type: bookmarks
+            groups:
+              - title: Cluster
+                links:
+                  - title: Argo CD
+                    url: https://argo.${DOMAIN}
+                  - title: Grafana
+                    url: https://grafana.${DOMAIN}
+                  - title: Echo
+                    url: https://echo.${DOMAIN}
+                  - title: Nginx Test
+                    url: https://nginx-test.${DOMAIN}
+              - title: Infrastructure
+                links:
+                  - title: Traefik
+                    url: https://traefik.${DOMAIN}
+                  - title: Portainer
+                    url: https://portainer.${DOMAIN}
+                  - title: Backrest
+                    url: https://backrest.${DOMAIN}
+                  - title: Gatus
+                    url: https://status.${DOMAIN}
+              - title: Media
+                links:
+                  - title: Jellyfin
+                    url: https://jellyfin.${DOMAIN}
+                  - title: Sonarr
+                    url: https://sonarr.${DOMAIN}
+                  - title: Radarr
+                    url: https://radarr.${DOMAIN}
+      - size: small
+        widgets:
+          - type: monitor
+            title: Service Health
+            cache: 1m
+            services:
+              - name: Argo CD
+                url: https://argo.${DOMAIN}
+              - name: Grafana
+                url: https://grafana.${DOMAIN}
+              - name: Echo
+                url: https://echo.${DOMAIN}
+              - name: Glance
+                url: https://glance.${DOMAIN}

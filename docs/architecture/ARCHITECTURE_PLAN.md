@@ -9,6 +9,7 @@ Operate the homelab from a single primary repository while keeping changes small
 -   `infra/docker/`: host-level Docker services that support the homelab outside Kubernetes.
 -   `infra/terraform/`: current repo-native infrastructure for the Docker layer and related shared services.
 -   `terraform/`, `talos/`, `kubernetes/`, `bootstrap/`, and `.taskfiles/`: root-level Talos, Argo CD, and OpenTofu workspace migrated from the legacy cluster repo.
+-   `kubernetes/apps/default/`: lightweight default-namespace apps used for baseline GitOps validation and small utility workloads.
 
 ## Current Migration Direction
 
