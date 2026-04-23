@@ -21,9 +21,12 @@ The Docker tasks now expect their runtime values to be injected from Doppler:
 
 The key values used by the Docker stack include:
 
+-   `DOMAIN`
 -   `CLOUDFLARED_TUNNEL_TOKEN`
 -   `TRAEFIK_CLOUDFLARE_API_TOKEN`, `TRAEFIK_CLOUDFLARE_ZONE_ID`, `TRAEFIK_CLOUDFLARE_EMAIL`
 -   `ARCANE_ENCRYPTION_KEY`, `ARCANE_JWT_SECRET`
+
+Per-service values such as `ARCANE_HOSTNAME` or `BESZEL_APP_URL` are now optional overrides. By default the render step derives them from `DOMAIN`.
 
 ## Deploy
 

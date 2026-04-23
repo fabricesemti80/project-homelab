@@ -31,6 +31,7 @@ mise run stack:deploy
 
 -   Doppler is the source of Docker deployment secrets for this repo
 -   active Docker secret scope: `project-homelab / dev_homelab`
+-   `DOMAIN` is the primary hostname input; service hostnames and app URLs are derived from it unless explicitly overridden
 -   rendered runtime files are written to `infra/docker/runtime/`
 -   local secret material belongs under `infra/docker/secrets/`
 -   these runtime and secret paths stay out of Git
