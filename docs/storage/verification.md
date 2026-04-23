@@ -205,8 +205,8 @@ Common causes:
 
 | File                           | Purpose                            |
 | ------------------------------ | ---------------------------------- |
-| `docs/storage.md`              | Complete CephFS setup guide        |
-| `docs/storage-verification.md` | This file - verification checklist |
+| `docs/storage/overview.md`     | Complete CephFS setup guide        |
+| `docs/storage/verification.md` | This file - verification checklist |
 
 ---
 
@@ -315,6 +315,6 @@ PVC Name: nginx-test-pvc
 
 ## References
 
--   [Storage Setup Guide](./storage.md)
+-   [Storage Setup Guide](./overview.md)
 -   [Ceph-CSI Documentation](https://github.com/ceph/ceph-csi)
 -   [Ceph Documentation](https://docs.ceph.com/en/latest/cephfs/)

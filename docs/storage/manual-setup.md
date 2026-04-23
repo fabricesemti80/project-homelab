@@ -299,5 +299,5 @@ ssh root@pve-0 "ceph fs subvolume-group rm cephfs-vm csi" 2>/dev/null || true
 
 ## See Also
 
--   [Storage Setup Guide](./storage.md) - Complete architecture and setup guide
--   [Storage Verification](./storage-verification.md) - Verification checklist
+-   [Storage Setup Guide](./overview.md) - Complete architecture and setup guide
+-   [Storage Verification](./verification.md) - Verification checklist

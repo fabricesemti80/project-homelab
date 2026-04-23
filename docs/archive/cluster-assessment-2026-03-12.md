@@ -73,7 +73,7 @@ Read-only assessment of the homelab Kubernetes cluster architecture, security, n
 #### 4. Helmfile bootstrap timeout not applied
 
 -   **Location:** `bootstrap/helmfile.d/01-apps.yaml`
--   **Detail:** `docs/troubleshooting.md` documents that `timeout: 600` is needed for initial image pulls, but the source file still uses the default 300s.
+-   **Detail:** `docs/operations/troubleshooting.md` documents that `timeout: 600` is needed for initial image pulls, but the source file still uses the default 300s.
 -   **Action:** Add `timeout: 600` to the helmfile.
 
 #### 5. Unrendered template variable in internal Gateway
