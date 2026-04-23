@@ -50,15 +50,5 @@ pages:
                   #   url: https://radarr.${DOMAIN}
       - size: small
         widgets:
-          - type: monitor
-            title: Service Health
-            cache: 1m
-            services:
-              - name: Argo CD
-                url: https://argo.${DOMAIN}
-              - name: Grafana
-                url: https://grafana.${DOMAIN}
-              - name: Echo
-                url: https://echo.${DOMAIN}
-              - name: Glance
-                url: https://glance.${DOMAIN}
+          - type: hacker-news
+            limit: 10
