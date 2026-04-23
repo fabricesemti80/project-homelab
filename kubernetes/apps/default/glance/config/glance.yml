@@ -28,24 +28,26 @@ pages:
                     url: https://echo.${DOMAIN}
                   - title: Nginx Test
                     url: https://nginx-test.${DOMAIN}
-              - title: Infrastructure
-                links:
-                  - title: Traefik
-                    url: https://traefik.${DOMAIN}
-                  - title: Portainer
-                    url: https://portainer.${DOMAIN}
-                  - title: Backrest
-                    url: https://backrest.${DOMAIN}
-                  - title: Gatus
-                    url: https://status.${DOMAIN}
+              # - title: Infrastructure
+              #   links:
+              #     - title: Traefik
+              #       url: https://traefik.${DOMAIN}
+              #     - title: Portainer
+              #       url: https://portainer.${DOMAIN}
+              #     - title: Backrest
+              #       url: https://backrest.${DOMAIN}
+              #     - title: Gatus
+              #       url: https://status.${DOMAIN}
               - title: Media
                 links:
-                  - title: Jellyfin
-                    url: https://jellyfin.${DOMAIN}
-                  - title: Sonarr
-                    url: https://sonarr.${DOMAIN}
-                  - title: Radarr
-                    url: https://radarr.${DOMAIN}
+                  - title: Plex
+                    url: https://plex.krapulax.net
+                  # - title: Jellyfin
+                  #   url: https://jellyfin.${DOMAIN}
+                  # - title: Sonarr
+                  #   url: https://sonarr.${DOMAIN}
+                  # - title: Radarr
+                  #   url: https://radarr.${DOMAIN}
       - size: small
         widgets:
           - type: monitor
