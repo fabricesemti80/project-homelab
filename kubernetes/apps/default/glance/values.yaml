@@ -2,8 +2,6 @@
 controllers:
   glance:
     strategy: RollingUpdate
-    annotations:
-      reloader.stakater.com/auto: "true"
     containers:
       app:
         image:
@@ -35,6 +33,10 @@ controllers:
             memory: 64Mi
           limits:
             memory: 256Mi
+defaultPodOptions:
+  annotations:
+    reloader.stakater.com/auto: "true"
+
 service:
   app:
     controller: glance
