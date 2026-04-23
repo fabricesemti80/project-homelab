@@ -34,6 +34,7 @@ spec:
       - ApplyOutOfSyncOnly=true
       - Prune=false
       - RespectIgnoreDifferences=true
+      - IgnoreMissingValueFiles=true
   ignoreDifferences:
     - group: argoproj.io
       kind: Application

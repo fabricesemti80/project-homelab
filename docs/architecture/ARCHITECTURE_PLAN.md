@@ -15,19 +15,22 @@ Operate the homelab from a single primary repository while keeping changes small
 -   `project-homelab` becomes the main source of truth.
 -   The old `home-argo-cluster-2025` repo stays intact during transition.
 -   Argo CD will be repointed to `project-homelab`.
--   Existing worker VMs remain defined, but may stay powered off until we explicitly reintroduce them.
+-   The active Talos cluster is now modeled as three control-plane nodes only.
+-   Historical worker VMs remain infrastructure artifacts for rollback or later reuse, but are no longer part of the committed Talos node inventory.
 
 ## Assumptions
 
 -   The imported cluster should keep using its current Proxmox IDs, node IPs, Talos secrets, and Terraform state.
 -   Secrets and runtime artifacts remain local-only and gitignored.
 -   Doppler project names and existing external integrations can stay unchanged during the repo migration.
+-   Removing workers from Talos configuration does not require deleting the underlying VM definitions on the same change.
 
 ## Validation Checks
 
 -   `task tofu:init`
 -   `task tofu:plan`
 -   `kubectl get nodes`
+-   `talosctl --talosconfig talos/clusterconfig/talosconfig config info`
 -   `task sync-argo-bootstrap`
 
 ## Rollback
@@ -35,3 +38,4 @@ Operate the homelab from a single primary repository while keeping changes small
 -   Repoint Argo CD back to `home-argo-cluster-2025`.
 -   Continue operating from the original repo because its state and files remain untouched.
 -   Restore any copied local-only runtime files from the old workspace if the new one is discarded.
+-   Reintroduce worker nodes by restoring them to `nodes.yaml`, regenerating `talos/talconfig.yaml`, and re-running Talos config generation.

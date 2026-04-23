@@ -6,21 +6,17 @@ Deliver a bootstrapped Talos Kubernetes cluster on Proxmox with private-only Tai
 
 ## 1) Current VM matrix
 
-| Node        | Role          |  Target IP | VMID | vCPU |    RAM | OS Disk |                  Data Disk |
-| ----------- | ------------- | ---------: | ---: | ---: | -----: | ------: | -------------------------: |
-| k8s-ctrl-01 | control-plane | 10.0.40.90 | 4090 |    4 |  8 GiB |  30 GiB |                        n/a |
-| k8s-ctrl-02 | control-plane | 10.0.40.91 | 4091 |    4 |  8 GiB |  30 GiB |                        n/a |
-| k8s-ctrl-03 | control-plane | 10.0.40.92 | 4092 |    4 |  8 GiB |  30 GiB |                        n/a |
-| k8s-wrkr-01 | worker        | 10.0.40.93 | 4093 |    4 | 10 GiB |  30 GiB | existing, may stay offline |
-| k8s-wrkr-02 | worker        | 10.0.40.94 | 4094 |    4 | 10 GiB |  30 GiB | existing, may stay offline |
-| k8s-wrkr-03 | worker        | 10.0.40.95 | 4095 |    4 | 10 GiB |  30 GiB | existing, may stay offline |
+| Node        | Role          |  Target IP | VMID | vCPU |   RAM | OS Disk | Data Disk |
+| ----------- | ------------- | ---------: | ---: | ---: | ----: | ------: | --------: |
+| k8s-ctrl-01 | control-plane | 10.0.40.90 | 4090 |    4 | 8 GiB |  30 GiB |       n/a |
+| k8s-ctrl-02 | control-plane | 10.0.40.91 | 4091 |    4 | 8 GiB |  30 GiB |       n/a |
+| k8s-ctrl-03 | control-plane | 10.0.40.92 | 4092 |    4 | 8 GiB |  30 GiB |       n/a |
 
-The current bring-up plan favors control planes first. Workers remain defined in OpenTofu but can stay powered off until needed.
+The current steady state favors control planes only. Historical worker VMs may remain defined in OpenTofu for rollback, but they are no longer part of the active Talos node inventory.
 
 ## 2) Placement strategy
 
 -   Place each control-plane VM on a different Proxmox node.
--   Place each worker VM on a different Proxmox node.
 -   Enable restart-on-boot and HA policy where available.
 
 ## 3) Bootstrap order
@@ -65,4 +61,4 @@ bootstrap/              # Helmfile-based cluster bootstrap
 -   Control plane healthy and routable.
 -   Cilium and Envoy Gateway healthy.
 -   Argo CD operational and syncing from Git.
--   Worker VMs preserved for later reintroduction if needed.
+-   Worker VMs can be reintroduced later by restoring them to the Talos node inventory and regenerating config.
