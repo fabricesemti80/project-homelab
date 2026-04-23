@@ -22,6 +22,11 @@ logs/
 *.p12
 *.kubeconfig
 kubeconfig
+age.key
+cloudflare-tunnel.json
+github-deploy.key
+github-deploy.key.pub
+github-push-token.txt
 secrets/
 **/secrets/**
 *.age
@@ -40,6 +45,7 @@ override.tf
 override.tf.json
 *_override.tf
 *_override.tf.json
+terraform/tfplan
 
 # ---- Ansible ----
 *.retry
@@ -52,6 +58,7 @@ __pycache__/
 venv/
 .pytest_cache/
 .mypy_cache/
+.task/
 
 # ---- Node ----
 node_modules/
@@ -71,3 +78,6 @@ infra/docker/runtime/
 infra/docker/secrets/
 infra/docker/data/
 scratch/
+cluster.yaml
+nodes.yaml
+talos/clusterconfig/*.yaml

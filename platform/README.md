@@ -2,8 +2,8 @@
 
 Base cluster services managed by GitOps:
 
-- cilium
-- ingress (Traefik)
-- argocd
-- longhorn
-- observability
+-   cilium
+-   ingress (Envoy Gateway)
+-   argocd
+-   ceph-csi
+-   observability

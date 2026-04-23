@@ -1,0 +1,281 @@
+apiVersion: gateway.envoyproxy.io/v1alpha1
+kind: EnvoyProxy
+metadata:
+  name: envoy
+spec:
+  logging:
+    level:
+      default: info
+  provider:
+    type: Kubernetes
+    kubernetes:
+      envoyDeployment:
+        replicas: 2
+        container:
+          imageRepository: mirror.gcr.io/envoyproxy/envoy
+          resources:
+            requests:
+              cpu: 100m
+            limits:
+              memory: 1Gi
+      envoyService:
+        externalTrafficPolicy: Cluster
+  shutdown:
+    drainTimeout: 180s
+  telemetry:
+    metrics:
+      prometheus:
+        compression:
+          type: Zstd
+sops:
+  age:
+    - recipient: age1saea3t7l67lavg0ardepzys6egp50g82uvks98pk53xdlj57uf8sa2arcs
+      enc: |
+        -----BEGIN AGE ENCRYPTED FILE-----
+        YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBBcnNYcndwcXErdytTbFRj
+        bHFtcDI2M2JBVkdsMnN4Tk91OXBOeGgzNzBJCjIzNG9PU3kvaDBsVXVlRUxQekxi
+        WTRVTXBrMVQxRXdYSUJEczN6NEJMY1UKLS0tIDdpUGE0Y1JNZHI3Z2NGY1l5amVN
+        d28vaUpzOCtRQlZZNXNpZklFdjZQL2MKlLJ0lZqRkV4F/8J/lD0uvWir5cJnJku0
+        ySNTJB78y85Z9BYuLxzYhBPLFtqSsNOkV5LJj9zeH5ndJ1JbomF4xQ==
+        -----END AGE ENCRYPTED FILE-----
+  lastmodified: "2026-03-19T09:48:31Z"
+  mac: ENC[AES256_GCM,data:RMZsmc41uGYhpUnq8P7q7eqtGrR/fsSFNS1pHq/4QvmShV9ROyphGPq3rWAG36L3AFpJ9gya5y9J3aOTZzBFKnkLjo6iAHFDdWjpqiQeoCQIeHeNe5aUYNYuA/z0i9cEwW2sLKnCDKVnCfX8DAv/XdqfZXsuISJyESEuuosHR50=,iv:D+5jS5291IoakuutdZ11Bo2lXCna5nS9vBHxLehxH38=,tag:2MHGUwiIPIdzyezpQptdkw==,type:str]
+  encrypted_regex: ^(data|stringData)$
+  mac_only_encrypted: true
+  version: 3.12.1
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: GatewayClass
+metadata:
+  name: envoy
+spec:
+  controllerName: gateway.envoyproxy.io/gatewayclass-controller
+  parametersRef:
+    group: gateway.envoyproxy.io
+    kind: EnvoyProxy
+    name: envoy
+    namespace: network
+sops:
+  age:
+    - recipient: age1saea3t7l67lavg0ardepzys6egp50g82uvks98pk53xdlj57uf8sa2arcs
+      enc: |
+        -----BEGIN AGE ENCRYPTED FILE-----
+        YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBBcnNYcndwcXErdytTbFRj
+        bHFtcDI2M2JBVkdsMnN4Tk91OXBOeGgzNzBJCjIzNG9PU3kvaDBsVXVlRUxQekxi
+        WTRVTXBrMVQxRXdYSUJEczN6NEJMY1UKLS0tIDdpUGE0Y1JNZHI3Z2NGY1l5amVN
+        d28vaUpzOCtRQlZZNXNpZklFdjZQL2MKlLJ0lZqRkV4F/8J/lD0uvWir5cJnJku0
+        ySNTJB78y85Z9BYuLxzYhBPLFtqSsNOkV5LJj9zeH5ndJ1JbomF4xQ==
+        -----END AGE ENCRYPTED FILE-----
+  lastmodified: "2026-03-19T09:48:31Z"
+  mac: ENC[AES256_GCM,data:RMZsmc41uGYhpUnq8P7q7eqtGrR/fsSFNS1pHq/4QvmShV9ROyphGPq3rWAG36L3AFpJ9gya5y9J3aOTZzBFKnkLjo6iAHFDdWjpqiQeoCQIeHeNe5aUYNYuA/z0i9cEwW2sLKnCDKVnCfX8DAv/XdqfZXsuISJyESEuuosHR50=,iv:D+5jS5291IoakuutdZ11Bo2lXCna5nS9vBHxLehxH38=,tag:2MHGUwiIPIdzyezpQptdkw==,type:str]
+  encrypted_regex: ^(data|stringData)$
+  mac_only_encrypted: true
+  version: 3.12.1
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: envoy-external
+  annotations:
+    external-dns.alpha.kubernetes.io/target: external.krapulax.dev
+spec:
+  gatewayClassName: envoy
+  infrastructure:
+    annotations:
+      external-dns.alpha.kubernetes.io/hostname: external.krapulax.dev
+      lbipam.cilium.io/ips: 10.0.40.103
+  listeners:
+    - name: http
+      protocol: HTTP
+      port: 80
+      allowedRoutes:
+        namespaces:
+          from: Same
+    - name: https
+      protocol: HTTPS
+      port: 443
+      allowedRoutes:
+        namespaces:
+          from: All
+      tls:
+        certificateRefs:
+          - kind: Secret
+            name: krapulax-dev-production-tls
+sops:
+  age:
+    - recipient: age1saea3t7l67lavg0ardepzys6egp50g82uvks98pk53xdlj57uf8sa2arcs
+      enc: |
+        -----BEGIN AGE ENCRYPTED FILE-----
+        YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBBcnNYcndwcXErdytTbFRj
+        bHFtcDI2M2JBVkdsMnN4Tk91OXBOeGgzNzBJCjIzNG9PU3kvaDBsVXVlRUxQekxi
+        WTRVTXBrMVQxRXdYSUJEczN6NEJMY1UKLS0tIDdpUGE0Y1JNZHI3Z2NGY1l5amVN
+        d28vaUpzOCtRQlZZNXNpZklFdjZQL2MKlLJ0lZqRkV4F/8J/lD0uvWir5cJnJku0
+        ySNTJB78y85Z9BYuLxzYhBPLFtqSsNOkV5LJj9zeH5ndJ1JbomF4xQ==
+        -----END AGE ENCRYPTED FILE-----
+  lastmodified: "2026-03-19T09:48:31Z"
+  mac: ENC[AES256_GCM,data:RMZsmc41uGYhpUnq8P7q7eqtGrR/fsSFNS1pHq/4QvmShV9ROyphGPq3rWAG36L3AFpJ9gya5y9J3aOTZzBFKnkLjo6iAHFDdWjpqiQeoCQIeHeNe5aUYNYuA/z0i9cEwW2sLKnCDKVnCfX8DAv/XdqfZXsuISJyESEuuosHR50=,iv:D+5jS5291IoakuutdZ11Bo2lXCna5nS9vBHxLehxH38=,tag:2MHGUwiIPIdzyezpQptdkw==,type:str]
+  encrypted_regex: ^(data|stringData)$
+  mac_only_encrypted: true
+  version: 3.12.1
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: envoy-internal
+  annotations:
+    external-dns.alpha.kubernetes.io/target: internal.krapulax.dev
+spec:
+  gatewayClassName: envoy
+  infrastructure:
+    annotations:
+      external-dns.alpha.kubernetes.io/hostname: internal.krapulax.dev
+      lbipam.cilium.io/ips: 10.0.40.102
+  listeners:
+    - name: http
+      protocol: HTTP
+      port: 80
+      allowedRoutes:
+        namespaces:
+          from: All
+    - name: https
+      protocol: HTTPS
+      port: 443
+      allowedRoutes:
+        namespaces:
+          from: All
+      tls:
+        certificateRefs:
+          - kind: Secret
+            name: krapulax-dev-production-tls
+sops:
+  age:
+    - recipient: age1saea3t7l67lavg0ardepzys6egp50g82uvks98pk53xdlj57uf8sa2arcs
+      enc: |
+        -----BEGIN AGE ENCRYPTED FILE-----
+        YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBBcnNYcndwcXErdytTbFRj
+        bHFtcDI2M2JBVkdsMnN4Tk91OXBOeGgzNzBJCjIzNG9PU3kvaDBsVXVlRUxQekxi
+        WTRVTXBrMVQxRXdYSUJEczN6NEJMY1UKLS0tIDdpUGE0Y1JNZHI3Z2NGY1l5amVN
+        d28vaUpzOCtRQlZZNXNpZklFdjZQL2MKlLJ0lZqRkV4F/8J/lD0uvWir5cJnJku0
+        ySNTJB78y85Z9BYuLxzYhBPLFtqSsNOkV5LJj9zeH5ndJ1JbomF4xQ==
+        -----END AGE ENCRYPTED FILE-----
+  lastmodified: "2026-03-19T09:48:31Z"
+  mac: ENC[AES256_GCM,data:RMZsmc41uGYhpUnq8P7q7eqtGrR/fsSFNS1pHq/4QvmShV9ROyphGPq3rWAG36L3AFpJ9gya5y9J3aOTZzBFKnkLjo6iAHFDdWjpqiQeoCQIeHeNe5aUYNYuA/z0i9cEwW2sLKnCDKVnCfX8DAv/XdqfZXsuISJyESEuuosHR50=,iv:D+5jS5291IoakuutdZ11Bo2lXCna5nS9vBHxLehxH38=,tag:2MHGUwiIPIdzyezpQptdkw==,type:str]
+  encrypted_regex: ^(data|stringData)$
+  mac_only_encrypted: true
+  version: 3.12.1
+---
+apiVersion: gateway.envoyproxy.io/v1alpha1
+kind: BackendTrafficPolicy
+metadata:
+  name: envoy
+spec:
+  compressor:
+    - type: Zstd
+      zstd: {}
+    - type: Brotli
+      brotli: {}
+    - type: Gzip
+      gzip: {}
+  retry:
+    numRetries: 2
+    retryOn:
+      triggers:
+        - reset
+  targetSelectors:
+    - group: gateway.networking.k8s.io
+      kind: Gateway
+  tcpKeepalive: {}
+  timeout:
+    http:
+      requestTimeout: 0s
+sops:
+  age:
+    - recipient: age1saea3t7l67lavg0ardepzys6egp50g82uvks98pk53xdlj57uf8sa2arcs
+      enc: |
+        -----BEGIN AGE ENCRYPTED FILE-----
+        YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBBcnNYcndwcXErdytTbFRj
+        bHFtcDI2M2JBVkdsMnN4Tk91OXBOeGgzNzBJCjIzNG9PU3kvaDBsVXVlRUxQekxi
+        WTRVTXBrMVQxRXdYSUJEczN6NEJMY1UKLS0tIDdpUGE0Y1JNZHI3Z2NGY1l5amVN
+        d28vaUpzOCtRQlZZNXNpZklFdjZQL2MKlLJ0lZqRkV4F/8J/lD0uvWir5cJnJku0
+        ySNTJB78y85Z9BYuLxzYhBPLFtqSsNOkV5LJj9zeH5ndJ1JbomF4xQ==
+        -----END AGE ENCRYPTED FILE-----
+  lastmodified: "2026-03-19T09:48:31Z"
+  mac: ENC[AES256_GCM,data:RMZsmc41uGYhpUnq8P7q7eqtGrR/fsSFNS1pHq/4QvmShV9ROyphGPq3rWAG36L3AFpJ9gya5y9J3aOTZzBFKnkLjo6iAHFDdWjpqiQeoCQIeHeNe5aUYNYuA/z0i9cEwW2sLKnCDKVnCfX8DAv/XdqfZXsuISJyESEuuosHR50=,iv:D+5jS5291IoakuutdZ11Bo2lXCna5nS9vBHxLehxH38=,tag:2MHGUwiIPIdzyezpQptdkw==,type:str]
+  encrypted_regex: ^(data|stringData)$
+  mac_only_encrypted: true
+  version: 3.12.1
+---
+apiVersion: gateway.envoyproxy.io/v1alpha1
+kind: ClientTrafficPolicy
+metadata:
+  name: envoy
+spec:
+  clientIPDetection:
+    xForwardedFor:
+      trustedCIDRs:
+        - 10.42.0.0/16
+  http2:
+    onInvalidMessage: TerminateStream
+  http3: {}
+  targetSelectors:
+    - group: gateway.networking.k8s.io
+      kind: Gateway
+  tcpKeepalive: {}
+  tls:
+    minVersion: "1.2"
+    alpnProtocols:
+      - h2
+      - http/1.1
+sops:
+  age:
+    - recipient: age1saea3t7l67lavg0ardepzys6egp50g82uvks98pk53xdlj57uf8sa2arcs
+      enc: |
+        -----BEGIN AGE ENCRYPTED FILE-----
+        YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBBcnNYcndwcXErdytTbFRj
+        bHFtcDI2M2JBVkdsMnN4Tk91OXBOeGgzNzBJCjIzNG9PU3kvaDBsVXVlRUxQekxi
+        WTRVTXBrMVQxRXdYSUJEczN6NEJMY1UKLS0tIDdpUGE0Y1JNZHI3Z2NGY1l5amVN
+        d28vaUpzOCtRQlZZNXNpZklFdjZQL2MKlLJ0lZqRkV4F/8J/lD0uvWir5cJnJku0
+        ySNTJB78y85Z9BYuLxzYhBPLFtqSsNOkV5LJj9zeH5ndJ1JbomF4xQ==
+        -----END AGE ENCRYPTED FILE-----
+  lastmodified: "2026-03-19T09:48:31Z"
+  mac: ENC[AES256_GCM,data:RMZsmc41uGYhpUnq8P7q7eqtGrR/fsSFNS1pHq/4QvmShV9ROyphGPq3rWAG36L3AFpJ9gya5y9J3aOTZzBFKnkLjo6iAHFDdWjpqiQeoCQIeHeNe5aUYNYuA/z0i9cEwW2sLKnCDKVnCfX8DAv/XdqfZXsuISJyESEuuosHR50=,iv:D+5jS5291IoakuutdZ11Bo2lXCna5nS9vBHxLehxH38=,tag:2MHGUwiIPIdzyezpQptdkw==,type:str]
+  encrypted_regex: ^(data|stringData)$
+  mac_only_encrypted: true
+  version: 3.12.1
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: https-redirect
+  annotations:
+    external-dns.alpha.kubernetes.io/controller: none
+spec:
+  parentRefs:
+    - name: envoy-external
+      namespace: network
+      sectionName: http
+    - name: envoy-internal
+      namespace: network
+      sectionName: http
+  rules:
+    - filters:
+        - type: RequestRedirect
+          requestRedirect:
+            scheme: https
+            statusCode: 301
+sops:
+  age:
+    - recipient: age1saea3t7l67lavg0ardepzys6egp50g82uvks98pk53xdlj57uf8sa2arcs
+      enc: |
+        -----BEGIN AGE ENCRYPTED FILE-----
+        YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBBcnNYcndwcXErdytTbFRj
+        bHFtcDI2M2JBVkdsMnN4Tk91OXBOeGgzNzBJCjIzNG9PU3kvaDBsVXVlRUxQekxi
+        WTRVTXBrMVQxRXdYSUJEczN6NEJMY1UKLS0tIDdpUGE0Y1JNZHI3Z2NGY1l5amVN
+        d28vaUpzOCtRQlZZNXNpZklFdjZQL2MKlLJ0lZqRkV4F/8J/lD0uvWir5cJnJku0
+        ySNTJB78y85Z9BYuLxzYhBPLFtqSsNOkV5LJj9zeH5ndJ1JbomF4xQ==
+        -----END AGE ENCRYPTED FILE-----
+  lastmodified: "2026-03-19T09:48:31Z"
+  mac: ENC[AES256_GCM,data:RMZsmc41uGYhpUnq8P7q7eqtGrR/fsSFNS1pHq/4QvmShV9ROyphGPq3rWAG36L3AFpJ9gya5y9J3aOTZzBFKnkLjo6iAHFDdWjpqiQeoCQIeHeNe5aUYNYuA/z0i9cEwW2sLKnCDKVnCfX8DAv/XdqfZXsuISJyESEuuosHR50=,iv:D+5jS5291IoakuutdZ11Bo2lXCna5nS9vBHxLehxH38=,tag:2MHGUwiIPIdzyezpQptdkw==,type:str]
+  encrypted_regex: ^(data|stringData)$
+  mac_only_encrypted: true
+  version: 3.12.1

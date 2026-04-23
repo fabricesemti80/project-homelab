@@ -8,7 +8,7 @@ Welcome to the documentation wiki for the Personal Homelab project. This wiki do
 
 The base tier of this homelab is driven by a Proxmox host (`10.0.40.61`) running Docker, which handles essential routing, proxying, remote access, and lightweight support services.
 
-- [Docker Infrastructure Overview](docker-services.md) - Details on Traefik, Beszel, Cloudflared, Arcane, and validation endpoints.
+-   [Docker Infrastructure Overview](docker-services.md) - Details on Traefik, Beszel, Cloudflared, Arcane, and validation endpoints.
 
 ### 2. Talos & Proxmox Integration
 

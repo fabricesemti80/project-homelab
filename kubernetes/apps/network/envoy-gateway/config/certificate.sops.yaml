@@ -1,0 +1,33 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: krapulax-dev-production
+spec:
+  dnsNames:
+    - krapulax.dev
+    - '*.krapulax.dev'
+  duration: 160h
+  issuerRef:
+    name: letsencrypt-production
+    kind: ClusterIssuer
+  privateKey:
+    algorithm: ECDSA
+  secretName: krapulax-dev-production-tls
+  usages:
+    - digital signature
+sops:
+  age:
+    - recipient: age1saea3t7l67lavg0ardepzys6egp50g82uvks98pk53xdlj57uf8sa2arcs
+      enc: |
+        -----BEGIN AGE ENCRYPTED FILE-----
+        YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSB5V1YyT1JjNnV6VmtSNUxI
+        T0M5VE1ncWI0dUJwVjRnY01uUTEyUFJ6QlI0Cng0ZzkvK1JUbG1abEU2cWMxSzZh
+        VU5DWDd1aUs5WDEzcnBLL0dQblpBMUEKLS0tIEtzcXU0UldXSG5yYUgzU1JMRHVM
+        YjlJdXQ0SG5IS2VGSEJiZlNvVDN4VzgKzvAgAckQJXSe+et3+AcPLt0o8/LQ2reh
+        pewtfb7YbHiR019hLceAdmFrYhtTPQsMXq5My1ip/kGAyt90JvNOFQ==
+        -----END AGE ENCRYPTED FILE-----
+  lastmodified: "2026-03-19T09:48:31Z"
+  mac: ENC[AES256_GCM,data:WseOPaSPER36oxOqNKCxN2Esog8SJ3ZD+UCGmd0BkoPEs4orvB+y27rvsILB8D23+mwX/n7KxWDjoIry7hiUeNOa1nK2U9l8Ewkp1lZr5bPXDSzVn4G0mY0JKeQ69IheatGhmAdx8WW1W3LJapRvi3GWmvX79+y6so63IkQn4sI=,iv:75na7s2XIZ6+58uH85SAkStcx0BWqmpKoe1lU7tJZpk=,tag:b/KWlCrueNN0XRjV4u6vcQ==,type:str]
+  encrypted_regex: ^(data|stringData)$
+  mac_only_encrypted: true
+  version: 3.12.1

@@ -5,20 +5,20 @@ It is intentionally plain Docker Compose so it can run on non-Nix machines.
 
 ## Layout
 
-- `docker-compose.yml`: main Compose entrypoint. It includes each service-specific Compose file.
-- `arcane/`, `beszel/`, `cloudflared/`, `traefik/`, `uptime-kuma/`, `whoami/`: one directory per service group.
-- `scripts/render-secrets.sh`: renders ignored runtime files from the repository root `.envrc`.
-- `scripts/deploy.sh`: renders runtime files and starts the local Docker Compose stack.
-- `runtime/`: generated config and secret mounts consumed by Compose. Ignored by Git.
-- `secrets/`: local source secret material. Ignored by Git.
+-   `docker-compose.yml`: main Compose entrypoint. It includes each service-specific Compose file.
+-   `arcane/`, `beszel/`, `cloudflared/`, `traefik/`, `uptime-kuma/`, `whoami/`: one directory per service group.
+-   `scripts/render-secrets.sh`: renders ignored runtime files from the repository root `.envrc`.
+-   `scripts/deploy.sh`: renders runtime files and starts the local Docker Compose stack.
+-   `runtime/`: generated config and secret mounts consumed by Compose. Ignored by Git.
+-   `secrets/`: local source secret material. Ignored by Git.
 
 ## Required Local Secrets
 
 The root `.envrc` is local and ignored. It must provide:
 
-- `CLOUDFLARED_TUNNEL_TOKEN`
-- `TRAEFIK_CLOUDFLARE_API_TOKEN`, `TRAEFIK_CLOUDFLARE_ZONE_ID`, `TRAEFIK_CLOUDFLARE_EMAIL`
-- `ARCANE_ENCRYPTION_KEY`, `ARCANE_JWT_SECRET`
+-   `CLOUDFLARED_TUNNEL_TOKEN`
+-   `TRAEFIK_CLOUDFLARE_API_TOKEN`, `TRAEFIK_CLOUDFLARE_ZONE_ID`, `TRAEFIK_CLOUDFLARE_EMAIL`
+-   `ARCANE_ENCRYPTION_KEY`, `ARCANE_JWT_SECRET`
 
 ## Deploy
 

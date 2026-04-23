@@ -1,52 +1,101 @@
+[env]
+_.python.venv = { path = "{{config_root}}/.venv", create = true }
+KUBECONFIG = "{{config_root}}/kubeconfig"
+SOPS_AGE_KEY_FILE = "{{config_root}}/age.key"
+TALOSCONFIG = "{{config_root}}/talos/clusterconfig/talosconfig"
+
 [tools]
 # pin tooling versions as implementation progresses
 gitleaks = "latest"
 tflint = "latest"
 shellcheck = "latest"
 yamllint = "latest"
-terraform = "latest"
 shfmt = "latest"
 prettier = "latest"
+"python" = "3.14.3"
+"uv" = "0.10.9"
+"pipx" = "1.8.0"
+"pipx:makejinja" = "2.8.2"
+"aqua:opentofu/opentofu" = "latest"
+"aqua:argoproj/argo-cd" = "3.3.2"
+"aqua:budimanjojo/talhelper" = "3.1.5"
+"aqua:cilium/cilium-cli" = "0.19.2"
+"aqua:cli/cli" = "2.87.3"
+"aqua:cloudflare/cloudflared" = "2026.2.0"
+"aqua:cue-lang/cue" = "0.16.0"
+"aqua:FiloSottile/age" = "1.3.1"
+"aqua:getsops/sops" = "3.12.1"
+"aqua:go-task/task" = "3.49.1"
+"aqua:helm/helm" = "4.1.1"
+"aqua:helmfile/helmfile" = "1.4.1"
+"aqua:jqlang/jq" = "1.8.1"
+"aqua:kubernetes-sigs/kustomize" = "5.8.0"
+"aqua:kubernetes/kubernetes/kubectl" = "1.35.2"
+"aqua:mikefarah/yq" = "4.52.4"
+"aqua:siderolabs/talos" = "1.12.4"
+"aqua:yannh/kubeconform" = "0.7.0"
+"aqua:viaduct-ai/kustomize-sops" = "4.4.0"
 
 [tasks.validate]
 description = "Validate repository structure and required files"
 run = "bash scripts/validate.sh"
 
+[tasks.deps]
+description = "Install Helm dependencies for the cluster workflow"
+run = [
+  "helm plugin list | grep -q 'secrets' || helm plugin install https://github.com/jkroepke/helm-secrets --verify=false",
+  "helm plugin list | grep -q 'diff' || helm plugin install https://github.com/databus23/helm-diff --verify=false"
+]
+
 [tasks."infra:provision"]
-description = "Provision Talos VMs on Proxmox"
-run = "bash scripts/infra_provision.sh"
+description = "Apply the cluster OpenTofu stack"
+run = "task tofu:apply"
 
 [tasks."talos:genconfig"]
 description = "Generate Talos machine configuration"
-run = "bash scripts/talos_genconfig.sh"
+run = "task talos:generate-config"
 
 [tasks."talos:bootstrap"]
 description = "Bootstrap Talos cluster and join nodes"
-run = "bash scripts/talos_bootstrap.sh"
+run = "task bootstrap:talos"
+
+[tasks."apps:bootstrap"]
+description = "Bootstrap cluster apps after Talos is healthy"
+run = "task bootstrap:apps"
 
 [tasks."platform:cilium"]
 description = "Install and validate Cilium"
-run = "bash scripts/platform_cilium.sh"
+run = [
+  "task sync-argo-bootstrap",
+  "kubectl --namespace argo-system get applications.argoproj.io cilium",
+  "kubectl --namespace kube-system rollout status daemonset/cilium --timeout=5m"
+]
 
 [tasks."platform:ingress"]
-description = "Install and validate Traefik ingress"
-run = "bash scripts/platform_ingress.sh"
+description = "Validate the Envoy Gateway ingress path"
+run = [
+  "task sync-argo-bootstrap",
+  "kubectl --namespace argo-system get applications.argoproj.io envoy-gateway",
+  "kubectl --namespace network rollout status deployment/envoy-gateway --timeout=5m"
+]
 
 [tasks."platform:argocd"]
 description = "Install and validate Argo CD"
-run = "bash scripts/platform_argocd.sh"
-
-[tasks."platform:longhorn"]
-description = "Install and validate Longhorn"
-run = "bash scripts/platform_longhorn.sh"
+run = "task sync-argo-bootstrap"
 
 [tasks."platform:observability"]
 description = "Install observability stack"
-run = "bash scripts/platform_observability.sh"
+run = [
+  "task sync-argo-bootstrap",
+  "kubectl --namespace argo-system get applications.argoproj.io kube-prometheus-stack"
+]
 
 [tasks."verify:cluster"]
 description = "Run post-bootstrap verification checks"
-run = "bash scripts/verify_cluster.sh"
+run = [
+  "kubectl get nodes -o wide",
+  "talosctl --talosconfig talos/clusterconfig/talosconfig health"
+]
 
 [tasks."stack:render"]
 description = "Render Docker runtime files from .envrc"
@@ -61,23 +110,67 @@ description = "Render runtime files and start the host-level Docker Compose stac
 run = "bash infra/docker/scripts/deploy.sh"
 
 [tasks."tf:init"]
-description = "Initialize Terraform in infra/terraform"
-run = "terraform init"
-dir = "infra/terraform"
+description = "Initialize both root OpenTofu stacks"
+run = [
+  "tofu -chdir=infra/terraform init",
+  "task tofu:init"
+]
 
 [tasks."tf:plan"]
-description = "Plan Terraform infrastructure changes"
-run = "terraform plan"
-dir = "infra/terraform"
+description = "Plan both root OpenTofu stacks"
+run = [
+  "tofu -chdir=infra/terraform plan",
+  "task tofu:plan"
+]
 
 [tasks."tf:apply"]
-description = "Apply Terraform infrastructure changes"
-run = "terraform apply -auto-approve"
-dir = "infra/terraform"
+description = "Apply both root OpenTofu stacks"
+run = [
+  "tofu -chdir=infra/terraform apply -auto-approve",
+  "task tofu:apply"
+]
+
+[tasks."tf:destroy"]
+description = "Destroy the imported cluster OpenTofu stack"
+run = "task tofu:destroy"
+
+[tasks."cluster:tf:init"]
+description = "Initialize the imported cluster OpenTofu stack"
+run = "task tofu:init"
+
+[tasks."cluster:tf:plan"]
+description = "Plan the imported cluster OpenTofu stack"
+run = "task tofu:plan"
+
+[tasks."cluster:tf:apply"]
+description = "Apply the imported cluster OpenTofu stack"
+run = "task tofu:apply"
+
+[tasks."cluster:sync-argo"]
+description = "Apply the Argo bootstrap resources from this repo"
+run = "task sync-argo-bootstrap"
+
+[tasks."cluster:reconcile"]
+description = "Force Argo to reconcile the cluster apps"
+run = "task reconcile"
+
+[tasks."mgmt:init"]
+description = "Bootstrap the management host from inside this repo"
+run = "bash scripts/management-init.sh"
+
+[tasks."mgmt:bootstrap"]
+description = "Bootstrap the management VM over SSH from this workstation"
+run = "bash scripts/bootstrap-management-vm.sh"
 
 [tasks.lint]
 description = "Run all linters manually with auto-fixing where possible"
-run = "mise run tf:fmt && shfmt -w -i 2 -s scripts/*.sh infra/docker/scripts/*.sh && yamllint . && shellcheck scripts/*.sh infra/docker/scripts/*.sh"
+run = [
+  "tofu -chdir=infra/terraform fmt -recursive",
+  "tofu -chdir=terraform fmt -recursive",
+  "shfmt -w -i 2 -s scripts/*.sh scripts/lib/*.sh infra/docker/scripts/*.sh",
+  "yamllint .",
+  "shellcheck scripts/*.sh scripts/lib/*.sh infra/docker/scripts/*.sh"
+]
 
 [tasks."pre-commit:install"]
 description = "Install pre-commit git hooks"
@@ -88,6 +181,8 @@ description = "Run all pre-commit hooks against all files"
 run = "pre-commit run --all-files"
 
 [tasks."tf:fmt"]
-description = "Format all Terraform files"
-run = "terraform fmt -recursive"
-dir = "infra/terraform"
+description = "Format both OpenTofu stacks"
+run = [
+  "tofu -chdir=infra/terraform fmt -recursive",
+  "tofu -chdir=terraform fmt -recursive"
+]
