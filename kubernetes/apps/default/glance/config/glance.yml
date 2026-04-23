@@ -16,6 +16,12 @@ pages:
             location: London, United Kingdom
       - size: full
         widgets:
+          - type: reddit
+            subreddit: technology
+          - type: hacker-news
+            limit: 10
+      - size: small
+        widgets:
           - type: search
           - type: bookmarks
             groups:
@@ -49,11 +55,3 @@ pages:
                   #   url: https://sonarr.${DOMAIN}
                   # - title: Radarr
                   #   url: https://radarr.${DOMAIN}
-      - size: small
-        widgets:
-          - type: reddit
-            subreddit: technology
-      - size: small
-        widgets:
-          - type: hacker-news
-            limit: 10
