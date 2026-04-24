@@ -20,6 +20,9 @@ pages:
             subreddit: technology
           - type: hacker-news
             limit: 10
+          - type: videos
+            channels:
+              - UCfTtcS6gPVcSeZXvgnFSKsA          
       - size: small
         widgets:
           - type: search
