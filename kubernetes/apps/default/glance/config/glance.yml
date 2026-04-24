@@ -21,8 +21,9 @@ pages:
           - type: hacker-news
             limit: 10
           - type: videos
-            channels:
-              - UCfTtcS6gPVcSeZXvgnFSKsA          
+            channels: # https://www.streamweasels.com/%20tools/youtube-channel-id-and-%20user-id-convertor/ => to find ID
+              - UCfTtcS6gPVcSeZXvgnFSKsA
+              - UCDvxjEa8yz5FlQLwH5F05rQ
       - size: small
         widgets:
           - type: search
