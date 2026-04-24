@@ -11,11 +11,12 @@ pages:
         widgets:
           - type: clock
             time-format: "15:04"
+          - type: to-do
+            id: dashboard            
           - type: calendar
           - type: weather
             location: London, United Kingdom
-          - type: to-do
-            id: dashboard
+
 
       - size: full
         widgets:
