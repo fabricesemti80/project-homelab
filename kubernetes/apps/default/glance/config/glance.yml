@@ -14,9 +14,6 @@ pages:
           - type: to-do
             id: dashboard            
           - type: calendar
-          - type: weather
-            location: London, United Kingdom
-
 
       - size: full
         widgets:
@@ -39,6 +36,8 @@ pages:
 
       - size: small
         widgets:
+          - type: weather
+            location: Stevenage, United Kingdom        
           - type: search
           - type: bookmarks
             groups:
