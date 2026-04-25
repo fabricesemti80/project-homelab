@@ -21,6 +21,7 @@ This is the main documentation hub for `project-homelab`.
 ## Storage
 
 -   [Storage Overview](storage/overview.md)
+-   [Media NFS Storage](storage/media-nfs.md)
 -   [Storage Manual Setup](storage/manual-setup.md)
 -   [Storage Verification](storage/verification.md)
 
