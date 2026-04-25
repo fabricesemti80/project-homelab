@@ -4,3 +4,4 @@ kind: Kustomization
 resources:
   - ./daemonset.yaml
   - ./doppler-secret.yaml
+  - ./pvc.yaml
