@@ -12,7 +12,6 @@ locals {
   apps = {
     "arcane" = "arcane.krapulax.dev"
     "beszel" = "beszel.krapulax.dev"
-    "jelly"  = "jelly.krapulax.dev"
     "uptime" = "uptime.krapulax.dev"
     "whoami" = "whoami.krapulax.dev"
   }
@@ -81,10 +80,10 @@ resource "cloudflare_zero_trust_access_application" "app" {
 }
 
 resource "cloudflare_zero_trust_access_application" "bypass_app" {
-  for_each = toset(["beszel", "jelly"])
+  for_each = toset(["beszel"])
 
   account_id = var.cloudflare_account_id
-  name       = each.key == "beszel" ? "Beszel Bypass" : "Jellyfin Bypass"
+  name       = "Beszel Bypass"
   domain     = local.apps[each.key]
   type       = "self_hosted"
 
