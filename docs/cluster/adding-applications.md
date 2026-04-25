@@ -4,11 +4,12 @@ This guide walks you through adding a new application to your Kubernetes cluster
 
 ## Overview
 
-Applications in this cluster are managed through Argo CD and consist of three main components:
+Applications in this cluster are managed through Argo CD and usually consist of these components:
 
 1. **Helm Values** - Configuration for the Helm chart (`kubernetes/apps/<namespace>/<app>/values.yaml`)
-2. **Secrets** - Encrypted sensitive values (`kubernetes/apps/<namespace>/<app>/values.sops.yaml`)
-3. **Argo Application** - Tells Argo CD how to deploy (`kubernetes/argo/apps/<namespace>/<app>.yaml`)
+2. **Secrets** - Either encrypted values in Git (`values.sops.yaml`) or a Doppler-backed `DopplerSecret`
+3. **Workload Manifests** - Optional raw Kubernetes manifests under `config/` for apps that are better modeled with kustomize
+4. **Argo Application** - Tells Argo CD how to deploy (`kubernetes/argo/apps/<namespace>/<app>.yaml`)
 
 ## Step-by-Step Guide
 
@@ -76,7 +77,46 @@ service:
                 port: 8080
 ```
 
-### 3. Create Encrypted Secrets (Optional)
+### 3. Choose a Secret Source (Optional)
+
+For new apps, prefer Doppler via the Kubernetes operator when you only need runtime secrets in-cluster.
+
+#### Option A: Doppler Operator
+
+Create a `DopplerSecret` manifest and keep it in Git with the rest of the app:
+
+```yaml
+apiVersion: secrets.doppler.com/v1alpha1
+kind: DopplerSecret
+metadata:
+    name: <app>-secrets
+    namespace: doppler-operator-system
+spec:
+    tokenSecret:
+        name: doppler-token-secret
+        namespace: doppler-operator-system
+    project: project-homelab
+    config: dev_homelab
+    managedSecret:
+        name: <app>-secrets
+        namespace: <namespace>
+        type: Opaque
+    secrets:
+        - MY_SECRET
+```
+
+Then reference the synced Kubernetes secret from your pod:
+
+```yaml
+env:
+    - name: MY_SECRET
+      valueFrom:
+          secretKeyRef:
+              name: <app>-secrets
+              key: MY_SECRET
+```
+
+#### Option B: SOPS in Git
 
 If your application needs secrets, create a `values.sops.yaml` file:
 
