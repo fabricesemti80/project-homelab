@@ -1,0 +1,61 @@
+---
+controllers:
+  sonarr:
+    strategy: RollingUpdate
+    containers:
+      app:
+        image:
+          repository: lscr.io/linuxserver/sonarr
+          tag: latest
+        env:
+          TZ: Europe/London
+          PUID: "1000"
+          PGID: "100"
+          UMASK: "002"
+        probes:
+          liveness: &probes
+            enabled: true
+            custom: true
+            spec:
+              httpGet:
+                path: /ping
+                port: 8989
+              initialDelaySeconds: 30
+              periodSeconds: 20
+              timeoutSeconds: 5
+              failureThreshold: 3
+          readiness: *probes
+        resources:
+          requests:
+            cpu: 100m
+            memory: 256Mi
+          limits:
+            memory: 2Gi
+
+service:
+  app:
+    controller: sonarr
+    ports:
+      http:
+        port: 8989
+        targetPort: 8989
+
+persistence:
+  config:
+    type: persistentVolumeClaim
+    accessMode: ReadWriteMany
+    storageClass: cephfs
+    size: 2Gi
+    globalMounts:
+      - path: /config
+  media:
+    enabled: true
+    existingClaim: media-library-pvc
+    globalMounts:
+      - path: /media
+  downloads:
+    enabled: true
+    existingClaim: media-library-pvc
+    globalMounts:
+      - path: /downloads
+        subPath: downloads

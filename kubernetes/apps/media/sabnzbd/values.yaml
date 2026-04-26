@@ -1,0 +1,66 @@
+---
+controllers:
+  sabnzbd:
+    strategy: RollingUpdate
+    containers:
+      app:
+        image:
+          repository: lscr.io/linuxserver/sabnzbd
+          tag: latest
+        env:
+          TZ: Europe/London
+          PUID: "1000"
+          PGID: "100"
+          UMASK: "002"
+        probes:
+          liveness: &probes
+            enabled: true
+            custom: true
+            spec:
+              tcpSocket:
+                port: 8080
+              initialDelaySeconds: 30
+              periodSeconds: 20
+              timeoutSeconds: 5
+              failureThreshold: 3
+          readiness: *probes
+        resources:
+          requests:
+            cpu: 100m
+            memory: 256Mi
+          limits:
+            memory: 2Gi
+
+service:
+  app:
+    controller: sabnzbd
+    ports:
+      http:
+        port: 8080
+        targetPort: 8080
+
+persistence:
+  config:
+    type: persistentVolumeClaim
+    accessMode: ReadWriteMany
+    storageClass: cephfs
+    size: 2Gi
+    globalMounts:
+      - path: /config
+  media:
+    enabled: true
+    existingClaim: media-library-pvc
+    globalMounts:
+      - path: /media
+  downloads:
+    enabled: true
+    existingClaim: media-library-pvc
+    globalMounts:
+      - path: /downloads
+        subPath: downloads/complete
+  incomplete-downloads:
+    enabled: true
+    existingClaim: media-library-pvc
+    globalMounts:
+      - path: /incomplete-downloads
+        subPath: downloads/incomplete
