@@ -13,6 +13,7 @@ controllers:
           TZ: Europe/London
           CRON_SCHEDULE: "0 4 * * *"
           SONARR_URL: http://sonarr.media.svc.cluster.local:8989
+          RADARR_URL: http://radarr.media.svc.cluster.local:7878
         envFrom:
           - secretRef:
               name: recyclarr-secrets
