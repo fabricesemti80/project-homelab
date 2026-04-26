@@ -6,13 +6,15 @@ Deliver a bootstrapped Talos Kubernetes cluster on Proxmox with private-only Tai
 
 ## 1) Current VM matrix
 
-| Node        | Role          |  Target IP | VMID | vCPU |   RAM | OS Disk | Data Disk |
-| ----------- | ------------- | ---------: | ---: | ---: | ----: | ------: | --------: |
-| k8s-ctrl-01 | control-plane | 10.0.40.90 | 4090 |    4 | 8 GiB |  30 GiB |       n/a |
-| k8s-ctrl-02 | control-plane | 10.0.40.91 | 4091 |    4 | 8 GiB |  30 GiB |       n/a |
-| k8s-ctrl-03 | control-plane | 10.0.40.92 | 4092 |    4 | 8 GiB |  30 GiB |       n/a |
+| Node        | Role          |  Target IP | VMID | vCPU |    RAM | OS Disk | Data Disk |
+| ----------- | ------------- | ---------: | ---: | ---: | -----: | ------: | --------: |
+| k8s-ctrl-01 | control-plane | 10.0.40.90 | 4090 |    8 | 16 GiB |  30 GiB |       n/a |
+| k8s-ctrl-02 | control-plane | 10.0.40.91 | 4091 |    8 | 16 GiB |  30 GiB |       n/a |
+| k8s-ctrl-03 | control-plane | 10.0.40.92 | 4092 |    8 | 16 GiB |  30 GiB |       n/a |
 
 The current steady state favors control planes only. Historical worker VMs may remain defined in OpenTofu for rollback, but they are no longer part of the active Talos node inventory.
+
+The control-plane sizing is intentionally increased to absorb ingress, storage, observability, and media-management workloads while the cluster continues to operate without active worker nodes.
 
 ## 2) Placement strategy
 
