@@ -26,5 +26,6 @@ The pod mounts:
 
 Note:
 
--   this rollout exposes the WebUI but does not yet add dedicated inbound peer port forwarding
--   torrent downloads can still work, but seeding efficiency may be lower until peer-port exposure is added
+-   the cluster now exposes a dedicated peer `LoadBalancer` service at `10.0.40.104` for `6881/TCP` and `6881/UDP`
+-   add a router port forward from your WAN on `6881/TCP` and `6881/UDP` to `10.0.40.104:6881`
+-   once that forward is in place, qBittorrent should be connectable and seed much more effectively

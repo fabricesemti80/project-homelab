@@ -30,6 +30,7 @@
 -   [ ] Open `https://qbittorrent.krapulax.dev`
 -   [ ] Complete qBittorrent first-run setup
 -   [ ] Set qBittorrent save path to `/downloads` and temporary path to `/incomplete-downloads`
+-   [ ] Forward `6881/TCP` and `6881/UDP` from the router to `10.0.40.104:6881`
 -   [ ] Open `https://sonarr.krapulax.dev`
 -   [ ] Configure Sonarr root folders and downloader integration
 -   [ ] Open `https://prowlarr.krapulax.dev`
@@ -56,6 +57,7 @@
 -   [ ] `kubectl exec -n media deploy/sabnzbd -- grep '^host_whitelist' /config/sabnzbd.ini`
 -   [ ] `curl -I https://sabnzbd.krapulax.dev/`
 -   [ ] `curl -I https://qbittorrent.krapulax.dev/`
+-   [ ] `kubectl get svc -n media qbittorrent-peer`
 -   [ ] `curl -I https://sonarr.krapulax.dev/`
 -   [ ] `curl -I https://prowlarr.krapulax.dev/`
 -   [ ] `curl -I https://radarr.krapulax.dev/`

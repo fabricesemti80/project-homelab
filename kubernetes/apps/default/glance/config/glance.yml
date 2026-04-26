@@ -12,7 +12,7 @@ pages:
           - type: clock
             time-format: "15:04"
           - type: to-do
-            id: dashboard            
+            id: dashboard
           - type: calendar
 
       - size: full
@@ -37,7 +37,7 @@ pages:
       - size: small
         widgets:
           - type: weather
-            location: Stevenage, United Kingdom        
+            location: Stevenage, United Kingdom
           - type: search
           - type: bookmarks
             groups:
@@ -65,9 +65,17 @@ pages:
                 links:
                   - title: Plex
                     url: https://plex.krapulax.net
-                  # - title: Jellyfin
-                  #   url: https://jellyfin.${DOMAIN}
-                  # - title: Sonarr
-                  #   url: https://sonarr.${DOMAIN}
-                  # - title: Radarr
-                  #   url: https://radarr.${DOMAIN}
+                  - title: Jellyfin
+                    url: https://jelly.krapulax.dev
+                  - title: SABnzbd
+                    url: https://sabnzbd.krapulax.dev
+                  - title: qBittorrent
+                    url: https://qbittorrent.krapulax.dev
+                  - title: Sonarr
+                    url: https://sonarr.krapulax.dev
+                  - title: Radarr
+                    url: https://radarr.krapulax.dev
+                  - title: Prowlarr
+                    url: https://prowlarr.krapulax.dev
+                  - title: Jellyseerr
+                    url: https://requests.krapulax.dev

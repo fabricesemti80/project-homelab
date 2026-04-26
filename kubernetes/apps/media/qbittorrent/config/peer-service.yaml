@@ -1,0 +1,24 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: qbittorrent-peer
+  namespace: media
+  annotations:
+    io.cilium/lb-ipam-ips: 10.0.40.104
+spec:
+  type: LoadBalancer
+  externalTrafficPolicy: Cluster
+  selector:
+    app.kubernetes.io/controller: qbittorrent
+    app.kubernetes.io/instance: qbittorrent
+    app.kubernetes.io/name: qbittorrent
+  ports:
+    - name: bittorrent
+      protocol: TCP
+      port: 6881
+      targetPort: 6881
+    - name: bittorrent-udp
+      protocol: UDP
+      port: 6881
+      targetPort: 6881

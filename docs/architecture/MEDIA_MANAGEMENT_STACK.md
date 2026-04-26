@@ -56,6 +56,7 @@ Planned pod paths:
     -   `/config` on CephFS
     -   `/downloads` on NFS subpath `downloads/complete`
     -   `/incomplete-downloads` on NFS subpath `downloads/incomplete`
+    -   peer traffic exposed through a dedicated `LoadBalancer` service on `6881/TCP` and `6881/UDP`
 -   `prowlarr`
     -   `/config` on CephFS
 -   `recyclarr`
@@ -91,6 +92,7 @@ This avoids coupling runtime app internals to guessed static secrets in Doppler.
 -   Public ingress is acceptable temporarily for test access, but each app still needs its own application authentication enabled in the UI
 -   SABnzbd server credentials should not be committed; if later automated, source them from Doppler
 -   qBittorrent WebUI credentials should remain application-managed; if later automated, source them from Doppler
+-   qBittorrent peer efficiency depends on a manual router forward to the peer `LoadBalancer` IP and is not handled by Cloudflare
 -   Recyclarr API credentials should be sourced from Doppler rather than committed into Git
 -   The NFS-backed media library remains shared state and should be treated as retained data
 
