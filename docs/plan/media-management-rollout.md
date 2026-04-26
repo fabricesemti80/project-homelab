@@ -11,6 +11,7 @@
 
 -   [x] Add architecture notes for the media-management stack
 -   [x] Scaffold `sabnzbd` application manifests
+-   [x] Scaffold `qbittorrent` application manifests
 -   [x] Scaffold `sonarr` application manifests
 -   [x] Scaffold `prowlarr` application manifests
 -   [x] Scaffold `recyclarr` application manifests
@@ -26,6 +27,9 @@
 -   [ ] Open `https://sabnzbd.krapulax.dev`
 -   [ ] Complete SABnzbd first-run setup
 -   [ ] Add Usenet server details in the SABnzbd UI unless a later Doppler-backed bootstrap is introduced
+-   [ ] Open `https://qbittorrent.krapulax.dev`
+-   [ ] Complete qBittorrent first-run setup
+-   [ ] Set qBittorrent save path to `/downloads` and temporary path to `/incomplete-downloads`
 -   [ ] Open `https://sonarr.krapulax.dev`
 -   [ ] Configure Sonarr root folders and downloader integration
 -   [ ] Open `https://prowlarr.krapulax.dev`
@@ -43,6 +47,7 @@
 -   [ ] `kubectl get pods -n media`
 -   [ ] `kubectl get pvc -n media`
 -   [ ] `kubectl describe pod -n media -l app.kubernetes.io/name=sabnzbd`
+-   [ ] `kubectl describe pod -n media -l app.kubernetes.io/name=qbittorrent`
 -   [ ] `kubectl describe pod -n media -l app.kubernetes.io/name=sonarr`
 -   [ ] `kubectl describe pod -n media -l app.kubernetes.io/name=prowlarr`
 -   [ ] `kubectl describe pod -n media -l app.kubernetes.io/name=recyclarr`
@@ -50,6 +55,7 @@
 -   [ ] `kubectl describe pod -n media -l app.kubernetes.io/name=jellyseerr`
 -   [ ] `kubectl exec -n media deploy/sabnzbd -- grep '^host_whitelist' /config/sabnzbd.ini`
 -   [ ] `curl -I https://sabnzbd.krapulax.dev/`
+-   [ ] `curl -I https://qbittorrent.krapulax.dev/`
 -   [ ] `curl -I https://sonarr.krapulax.dev/`
 -   [ ] `curl -I https://prowlarr.krapulax.dev/`
 -   [ ] `curl -I https://radarr.krapulax.dev/`

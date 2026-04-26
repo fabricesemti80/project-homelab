@@ -13,6 +13,7 @@ Add media-management services that feed Jellyfin while preserving the existing s
 Initial rollout includes:
 
 -   `sabnzbd`
+-   `qbittorrent`
 -   `sonarr`
 -   `prowlarr`
 -   `recyclarr`
@@ -51,6 +52,10 @@ Planned pod paths:
     -   `/media` on NFS
     -   `/downloads` on NFS subpath `downloads/complete`
     -   `/incomplete-downloads` on NFS subpath `downloads/incomplete`
+-   `qbittorrent`
+    -   `/config` on CephFS
+    -   `/downloads` on NFS subpath `downloads/complete`
+    -   `/incomplete-downloads` on NFS subpath `downloads/incomplete`
 -   `prowlarr`
     -   `/config` on CephFS
 -   `recyclarr`
@@ -85,6 +90,7 @@ This avoids coupling runtime app internals to guessed static secrets in Doppler.
 
 -   Public ingress is acceptable temporarily for test access, but each app still needs its own application authentication enabled in the UI
 -   SABnzbd server credentials should not be committed; if later automated, source them from Doppler
+-   qBittorrent WebUI credentials should remain application-managed; if later automated, source them from Doppler
 -   Recyclarr API credentials should be sourced from Doppler rather than committed into Git
 -   The NFS-backed media library remains shared state and should be treated as retained data
 
@@ -102,6 +108,7 @@ already exist or can be created on the NFS server before workloads start.
 -   PVCs bind on CephFS
 -   pods mount both CephFS config and NFS library paths
 -   `sabnzbd` serves its UI and can write test files under `/downloads`
+-   `qbittorrent` serves its UI and can write test files under `/downloads` and `/incomplete-downloads`
 -   `sonarr` serves its UI and can see both `/media` and `/downloads`
 -   `prowlarr` serves its UI and can reach Sonarr over the in-cluster service
 -   `recyclarr` can run against Sonarr without authentication failures
@@ -110,7 +117,7 @@ already exist or can be created on the NFS server before workloads start.
 
 ## Rollback
 
--   Delete the `sabnzbd`, `sonarr`, `prowlarr`, `recyclarr`, `radarr`, and `jellyseerr` Argo applications
+-   Delete the `sabnzbd`, `qbittorrent`, `sonarr`, `prowlarr`, `recyclarr`, `radarr`, and `jellyseerr` Argo applications
 -   Remove their HTTPRoutes
 -   Delete their CephFS PVCs if app config should be discarded
 -   Retain NFS media content and download directories
