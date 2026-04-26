@@ -97,3 +97,23 @@ resource "cloudflare_zero_trust_access_application" "bypass_app" {
     }
   ]
 }
+
+resource "cloudflare_zero_trust_access_application" "jellyfin" {
+  count = 1
+
+  account_id = var.cloudflare_account_id
+  name       = "Jellyfin"
+  domain     = "jelly.krapulax.dev"
+  type       = "self_hosted"
+
+  http_only_cookie_attribute = true
+  session_duration           = "720h"
+  auto_redirect_to_identity  = false
+
+  policies = [
+    {
+      id         = cloudflare_zero_trust_access_policy.bypass[0].id
+      precedence = 1
+    }
+  ]
+}

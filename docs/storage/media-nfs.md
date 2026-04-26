@@ -18,6 +18,7 @@ This cluster can consume the existing media library over NFS for workloads such 
     -   mounts the static NFS library claim at `/data`
     -   uses CephFS PVCs for `/config` and `/cache`
     -   is exposed at `https://jelly.krapulax.dev` via the shared `external.krapulax.dev` Cloudflare tunnel target and the `envoy-external` Gateway
+    -   has a dedicated Cloudflare Access application configured for full bypass so Jellyfin handles authentication itself
 
 ## Assumptions
 
@@ -26,6 +27,7 @@ This cluster can consume the existing media library over NFS for workloads such 
 -   Permissions on the export allow Jellyfin to read the media files as configured
 -   `external.krapulax.dev` already terminates through the Cloudflare tunnel to the cluster `envoy-external` Gateway
 -   external-dns is reconciling `HTTPRoute` hostname annotations into Cloudflare DNS records
+-   `jelly.krapulax.dev` is intentionally bypassed at Cloudflare Access while other apps may still enforce Access policies
 
 ## Validation
 
@@ -47,6 +49,18 @@ dig +short jelly.krapulax.dev
 curl -I https://jelly.krapulax.dev/
 ```
 
+Then verify Access behaviour:
+
+```bash
+tofu -chdir=infra/terraform plan
+curl -I https://jelly.krapulax.dev/
+```
+
+Expected result:
+
+-   browsers, mobile apps, and TV clients reach Jellyfin without a Cloudflare Access prompt
+-   Jellyfin handles sign-in and authorization itself
+
 If the pod starts but libraries are empty, verify NFS connectivity and path contents from the storage server side.
 
 If the hostname still returns `404`, confirm the DNS record resolves to `external.krapulax.dev` rather than a stale direct tunnel target.
@@ -56,3 +70,4 @@ If the hostname still returns `404`, confirm the DNS record resolves to `externa
 -   Remove the external-dns annotations from `kubernetes/apps/media/jellyfin/config/http-route.yaml`
 -   Re-sync the Jellyfin Argo CD application so external-dns can withdraw the record
 -   Restore the prior DNS mapping only if a direct Cloudflare tunnel route is intentionally reintroduced
+-   Remove or tighten the `cloudflare_zero_trust_access_application.jellyfin` rule in `infra/terraform/main.tf` when you want Cloudflare Access enforcement back
