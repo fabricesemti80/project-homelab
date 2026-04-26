@@ -21,4 +21,4 @@ The pod mounts:
 
 -   `/config` on CephFS
 -   `/media` on the shared NFS library
--   `/downloads` on the shared NFS downloads path
+-   `/downloads` on the shared NFS completed-downloads path

@@ -58,4 +58,4 @@ persistence:
     existingClaim: media-library-pvc
     globalMounts:
       - path: /downloads
-        subPath: downloads
+        subPath: downloads/complete
