@@ -16,10 +16,11 @@ Initial rollout includes:
 -   `sonarr`
 -   `prowlarr`
 -   `recyclarr`
+-   `radarr`
+-   `jellyseerr`
 
 Deferred until the first two apps are stable:
 
--   `radarr`
 -   API-key automation between services
 
 ## Namespace Decision
@@ -55,6 +56,12 @@ Planned pod paths:
 -   `recyclarr`
     -   `/config` on CephFS
     -   reads API keys from Kubernetes secrets synced from Doppler
+-   `radarr`
+    -   `/config` on CephFS
+    -   `/media` on NFS
+    -   `/downloads` on NFS subpath `downloads/complete`
+-   `jellyseerr`
+    -   `/app/config` on CephFS
 
 ## API-Key Automation Direction
 
@@ -98,10 +105,12 @@ already exist or can be created on the NFS server before workloads start.
 -   `sonarr` serves its UI and can see both `/media` and `/downloads`
 -   `prowlarr` serves its UI and can reach Sonarr over the in-cluster service
 -   `recyclarr` can run against Sonarr without authentication failures
+-   `radarr` serves its UI and can see both `/media` and `/downloads`
+-   `jellyseerr` serves its UI and can reach Jellyfin, Sonarr, and Radarr over the configured URLs
 
 ## Rollback
 
--   Delete the `sabnzbd`, `sonarr`, `prowlarr`, and `recyclarr` Argo applications
+-   Delete the `sabnzbd`, `sonarr`, `prowlarr`, `recyclarr`, `radarr`, and `jellyseerr` Argo applications
 -   Remove their HTTPRoutes
 -   Delete their CephFS PVCs if app config should be discarded
 -   Retain NFS media content and download directories

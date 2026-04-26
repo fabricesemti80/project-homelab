@@ -1,0 +1,49 @@
+---
+controllers:
+  jellyseerr:
+    strategy: RollingUpdate
+    containers:
+      app:
+        image:
+          repository: fallenbagel/jellyseerr
+          tag: latest
+        env:
+          TZ: Europe/London
+          PUID: "0"
+          PGID: "0"
+        probes:
+          liveness: &probes
+            enabled: true
+            custom: true
+            spec:
+              httpGet:
+                path: /api/v1/status
+                port: 5055
+              initialDelaySeconds: 45
+              periodSeconds: 20
+              timeoutSeconds: 5
+              failureThreshold: 3
+          readiness: *probes
+        resources:
+          requests:
+            cpu: 50m
+            memory: 128Mi
+          limits:
+            memory: 1Gi
+
+service:
+  app:
+    controller: jellyseerr
+    ports:
+      http:
+        port: 5055
+        targetPort: 5055
+
+persistence:
+  config:
+    type: persistentVolumeClaim
+    accessMode: ReadWriteMany
+    storageClass: cephfs
+    size: 2Gi
+    globalMounts:
+      - path: /app/config

@@ -14,6 +14,8 @@
 -   [x] Scaffold `sonarr` application manifests
 -   [x] Scaffold `prowlarr` application manifests
 -   [x] Scaffold `recyclarr` application manifests
+-   [x] Scaffold `radarr` application manifests
+-   [x] Scaffold `jellyseerr` application manifests
 -   [x] Add Argo CD applications for the first services
 -   [ ] Sync Argo CD and verify workloads become healthy
 
@@ -31,6 +33,10 @@
 -   [ ] Add Sonarr as an app in Prowlarr using `http://sonarr.media.svc.cluster.local:8989`
 -   [ ] Add `SONARR_API_KEY` to Doppler for Recyclarr
 -   [ ] Verify Recyclarr syncs Sonarr quality settings
+-   [ ] Open `https://radarr.krapulax.dev`
+-   [ ] Configure Radarr root folders and downloader integration
+-   [ ] Open `https://requests.krapulax.dev`
+-   [ ] Connect Jellyseerr to Jellyfin, Sonarr, and Radarr
 
 ## Validation
 
@@ -40,13 +46,16 @@
 -   [ ] `kubectl describe pod -n media -l app.kubernetes.io/name=sonarr`
 -   [ ] `kubectl describe pod -n media -l app.kubernetes.io/name=prowlarr`
 -   [ ] `kubectl describe pod -n media -l app.kubernetes.io/name=recyclarr`
+-   [ ] `kubectl describe pod -n media -l app.kubernetes.io/name=radarr`
+-   [ ] `kubectl describe pod -n media -l app.kubernetes.io/name=jellyseerr`
 -   [ ] `kubectl exec -n media deploy/sabnzbd -- grep '^host_whitelist' /config/sabnzbd.ini`
 -   [ ] `curl -I https://sabnzbd.krapulax.dev/`
 -   [ ] `curl -I https://sonarr.krapulax.dev/`
 -   [ ] `curl -I https://prowlarr.krapulax.dev/`
+-   [ ] `curl -I https://radarr.krapulax.dev/`
+-   [ ] `curl -I https://requests.krapulax.dev/`
 -   [ ] `kubectl logs -n media deploy/recyclarr --tail=100`
 
 ## Follow-Up
 
--   [ ] Add `radarr`
 -   [ ] Design and implement API-key bootstrap automation
