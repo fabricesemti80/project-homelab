@@ -14,10 +14,10 @@ Initial rollout includes:
 
 -   `sabnzbd`
 -   `sonarr`
+-   `prowlarr`
 
 Deferred until the first two apps are stable:
 
--   `prowlarr`
 -   `radarr`
 -   API-key automation between services
 
@@ -49,6 +49,8 @@ Planned pod paths:
     -   `/media` on NFS
     -   `/downloads` on NFS subpath `downloads/complete`
     -   `/incomplete-downloads` on NFS subpath `downloads/incomplete`
+-   `prowlarr`
+    -   `/config` on CephFS
 
 ## API-Key Automation Direction
 
@@ -82,15 +84,16 @@ already exist or can be created on the NFS server before workloads start.
 
 ## Validation
 
--   Argo sync succeeds for both apps
+-   Argo sync succeeds for the deployed apps
 -   PVCs bind on CephFS
 -   pods mount both CephFS config and NFS library paths
 -   `sabnzbd` serves its UI and can write test files under `/downloads`
 -   `sonarr` serves its UI and can see both `/media` and `/downloads`
+-   `prowlarr` serves its UI and can reach Sonarr over the in-cluster service
 
 ## Rollback
 
--   Delete the `sabnzbd` and `sonarr` Argo applications
+-   Delete the `sabnzbd`, `sonarr`, and `prowlarr` Argo applications
 -   Remove their HTTPRoutes
 -   Delete their CephFS PVCs if app config should be discarded
 -   Retain NFS media content and download directories
