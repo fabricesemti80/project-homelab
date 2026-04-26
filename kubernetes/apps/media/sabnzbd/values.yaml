@@ -2,6 +2,60 @@
 controllers:
   sabnzbd:
     strategy: RollingUpdate
+    initContainers:
+      whitelist-config:
+        image:
+          repository: docker.io/library/alpine
+          tag: "3.22"
+        command:
+          - /bin/sh
+          - -ec
+        args:
+          - |
+            config_file="/config/sabnzbd.ini"
+            whitelist="sabnzbd,sabnzbd.krapulax.dev"
+
+            mkdir -p /config
+
+            if [ ! -f "${config_file}" ]; then
+              cat > "${config_file}" <<EOF
+            [misc]
+            host_whitelist = ${whitelist}
+            EOF
+              exit 0
+            fi
+
+            if grep -q '^host_whitelist *=.*' "${config_file}"; then
+              sed -i "s/^host_whitelist *=.*/host_whitelist = ${whitelist}/" "${config_file}"
+              exit 0
+            fi
+
+            if grep -q '^\[misc\]' "${config_file}"; then
+              awk -v whitelist="${whitelist}" '
+                BEGIN { inserted = 0 }
+                {
+                  print
+                  if (!inserted && $0 == "[misc]") {
+                    print "host_whitelist = " whitelist
+                    inserted = 1
+                  }
+                }
+                END {
+                  if (!inserted) {
+                    print "[misc]"
+                    print "host_whitelist = " whitelist
+                  }
+                }
+              ' "${config_file}" > "${config_file}.tmp"
+              mv "${config_file}.tmp" "${config_file}"
+              exit 0
+            fi
+
+            cat >> "${config_file}" <<EOF
+
+            [misc]
+            host_whitelist = ${whitelist}
+            EOF
     containers:
       app:
         image:

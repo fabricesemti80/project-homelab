@@ -31,6 +31,7 @@
 -   [ ] `kubectl get pvc -n media`
 -   [ ] `kubectl describe pod -n media -l app.kubernetes.io/name=sabnzbd`
 -   [ ] `kubectl describe pod -n media -l app.kubernetes.io/name=sonarr`
+-   [ ] `kubectl exec -n media deploy/sabnzbd -- grep '^host_whitelist' /config/sabnzbd.ini`
 -   [ ] `curl -I https://sabnzbd.krapulax.dev/`
 -   [ ] `curl -I https://sonarr.krapulax.dev/`
 
