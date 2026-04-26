@@ -31,6 +31,9 @@ controllers:
           limits:
             memory: 2Gi
 
+defaultPodOptions:
+  hostname: sabnzbd
+
 service:
   app:
     controller: sabnzbd
