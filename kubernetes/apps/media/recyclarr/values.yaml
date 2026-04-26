@@ -1,0 +1,49 @@
+---
+controllers:
+  recyclarr:
+    strategy: RollingUpdate
+    annotations:
+      reloader.stakater.com/auto: "true"
+    containers:
+      app:
+        image:
+          repository: ghcr.io/recyclarr/recyclarr
+          tag: "8"
+        env:
+          TZ: Europe/London
+          CRON_SCHEDULE: "0 4 * * *"
+          SONARR_URL: http://sonarr.media.svc.cluster.local:8989
+        envFrom:
+          - secretRef:
+              name: recyclarr-secrets
+        resources:
+          requests:
+            cpu: 25m
+            memory: 64Mi
+          limits:
+            memory: 512Mi
+
+defaultPodOptions:
+  annotations:
+    reloader.stakater.com/auto: "true"
+  securityContext:
+    runAsNonRoot: true
+    runAsUser: 1000
+    runAsGroup: 100
+    fsGroup: 100
+
+persistence:
+  config:
+    type: persistentVolumeClaim
+    accessMode: ReadWriteMany
+    storageClass: cephfs
+    size: 1Gi
+    globalMounts:
+      - path: /config
+  config-file:
+    type: configMap
+    name: recyclarr-configmap
+    globalMounts:
+      - path: /config/configs/recyclarr.yml
+        subPath: recyclarr.yml
+        readOnly: true

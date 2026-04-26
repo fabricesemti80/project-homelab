@@ -15,6 +15,7 @@ Initial rollout includes:
 -   `sabnzbd`
 -   `sonarr`
 -   `prowlarr`
+-   `recyclarr`
 
 Deferred until the first two apps are stable:
 
@@ -51,12 +52,17 @@ Planned pod paths:
     -   `/incomplete-downloads` on NFS subpath `downloads/incomplete`
 -   `prowlarr`
     -   `/config` on CephFS
+-   `recyclarr`
+    -   `/config` on CephFS
+    -   reads API keys from Kubernetes secrets synced from Doppler
 
 ## API-Key Automation Direction
 
 The long-term goal is to automate cross-service integration, especially for Prowlarr, Sonarr, and Radarr.
 
 For the initial rollout, do not assume app API keys can be cleanly injected through environment variables. Many of these applications generate and own their API keys internally.
+
+Recyclarr is the first exception to that rule because it is an API client rather than an API server. It is a good fit for Doppler-backed secrets because it only needs to consume Sonarr and later Radarr API keys.
 
 Recommended future pattern:
 
@@ -72,6 +78,7 @@ This avoids coupling runtime app internals to guessed static secrets in Doppler.
 
 -   Public ingress is acceptable temporarily for test access, but each app still needs its own application authentication enabled in the UI
 -   SABnzbd server credentials should not be committed; if later automated, source them from Doppler
+-   Recyclarr API credentials should be sourced from Doppler rather than committed into Git
 -   The NFS-backed media library remains shared state and should be treated as retained data
 
 ## Assumptions
@@ -90,10 +97,11 @@ already exist or can be created on the NFS server before workloads start.
 -   `sabnzbd` serves its UI and can write test files under `/downloads`
 -   `sonarr` serves its UI and can see both `/media` and `/downloads`
 -   `prowlarr` serves its UI and can reach Sonarr over the in-cluster service
+-   `recyclarr` can run against Sonarr without authentication failures
 
 ## Rollback
 
--   Delete the `sabnzbd`, `sonarr`, and `prowlarr` Argo applications
+-   Delete the `sabnzbd`, `sonarr`, `prowlarr`, and `recyclarr` Argo applications
 -   Remove their HTTPRoutes
 -   Delete their CephFS PVCs if app config should be discarded
 -   Retain NFS media content and download directories

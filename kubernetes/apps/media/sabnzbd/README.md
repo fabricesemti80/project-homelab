@@ -7,6 +7,7 @@ Recommended first settings:
 -   Folders:
     -   completed download folder: `/downloads`
     -   temporary download folder: `/incomplete-downloads`
+    -   if SABnzbd shows paths under `/config/Downloads/...`, update them to the two paths above and restart the job or retry it
 -   API:
     -   enable the API
     -   keep the API key handy for Sonarr and later Prowlarr
