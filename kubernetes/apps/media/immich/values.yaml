@@ -169,16 +169,20 @@ persistence:
   uploads:
     enabled: true
     existingClaim: media-library-pvc
-    globalMounts:
-      - path: /data
-        subPath: immich
+    advancedMounts:
+      immich:
+        app:
+          - path: /data
+            subPath: immich
   external-library:
     enabled: true
     existingClaim: media-library-pvc
-    globalMounts:
-      - path: /external-library
-        subPath: immich/library
-        readOnly: true
+    advancedMounts:
+      immich:
+        app:
+          - path: /external-library
+            subPath: immich/library
+            readOnly: true
   model-cache:
     type: persistentVolumeClaim
     accessMode: ReadWriteMany
