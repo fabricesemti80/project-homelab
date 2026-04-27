@@ -46,16 +46,16 @@ bootstrap/              # Helmfile-based cluster bootstrap
 
 ## 5) Mise task skeleton (planned)
 
--   `mise run validate`
--   `mise run infra:provision`
--   `mise run talos:genconfig`
--   `mise run talos:bootstrap`
--   `mise run apps:bootstrap`
--   `mise run platform:cilium`
--   `mise run platform:ingress`
--   `mise run platform:argocd`
--   `mise run platform:observability`
--   `mise run verify:cluster`
+-   `task validate`
+-   `task infra:provision`
+-   `task talos:genconfig`
+-   `task talos:bootstrap`
+-   `task apps:bootstrap`
+-   `task platform:cilium`
+-   `task platform:ingress`
+-   `task platform:argocd`
+-   `task platform:observability`
+-   `task verify:cluster`
 
 ## 6) Exit criteria for Phase 1
 

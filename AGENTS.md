@@ -28,8 +28,8 @@ This repository is also the main deployment home for the Talos cluster and the h
 
 ## Docker Deployment Rules
 
--   Use `mise run stack:render` before validating Compose config.
--   Use `mise run stack:deploy` from the Docker host checkout to start or update the stack.
+-   Use `task stack:render` before validating Compose config.
+-   Use `task stack:deploy` from the Docker host checkout to start or update the stack.
 -   Keep Docker stack deployment as a simple local Compose operation; do not bake SSH sync into the deploy task.
 -   Omni is intentionally not part of the Docker deployment; use Terraform/Talos-native flows for cluster provisioning.
 

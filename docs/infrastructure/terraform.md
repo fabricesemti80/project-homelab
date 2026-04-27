@@ -16,17 +16,17 @@ This repository currently has two OpenTofu stacks.
 ## Common Commands
 
 ```bash
-mise run tf:init
-mise run tf:plan
-mise run tf:apply
+task tf:init
+task tf:plan
+task tf:apply
 ```
 
 Cluster-only aliases:
 
 ```bash
-mise run cluster:tf:init
-mise run cluster:tf:plan
-mise run cluster:tf:apply
+task cluster:tf:init
+task cluster:tf:plan
+task cluster:tf:apply
 ```
 
 ## Related Documents

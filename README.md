@@ -27,25 +27,27 @@ Ensure `mise` is installed, then:
 
 ```bash
 mise install
-mise run deps
+task deps
 ```
 
 Common workflows:
 
 ```bash
 # Host-level Docker stack
-mise run stack:deploy
+task stack:deploy
 
 # Both OpenTofu stacks
-mise run tf:init
-mise run tf:plan
+task tf:init
+task tf:plan
 
 # Talos / cluster bootstrap flow
-mise run talos:genconfig
-mise run talos:bootstrap
-mise run apps:bootstrap
-mise run verify:cluster
+task talos:genconfig
+task talos:bootstrap
+task apps:bootstrap
+task verify:cluster
 ```
+
+Task execution now lives in structured files under `.taskfiles/`. `mise.toml` remains the source of truth for tool installation and environment setup.
 
 ## Repository Notes
 

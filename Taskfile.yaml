@@ -19,6 +19,10 @@ env:
 
 includes:
   bootstrap: .taskfiles/bootstrap
+  cluster: .taskfiles/cluster
+  docker: .taskfiles/docker
+  management: .taskfiles/management
+  repo: .taskfiles/repo
   talos: .taskfiles/talos
   template: .taskfiles/template
   tofu: .taskfiles/tofu
@@ -27,23 +31,126 @@ tasks:
 
   default: task --list
 
+  validate:
+    desc: Validate repository structure and required files
+    task: repo:validate
+
+  deps:
+    desc: Install Helm dependencies for the cluster workflow
+    task: repo:deps
+
+  lint:
+    desc: Run linters manually with auto-fixing where possible
+    task: repo:lint
+
+  pre-commit:install:
+    desc: Install pre-commit git hooks
+    task: repo:pre-commit-install
+
+  pre-commit:run:
+    desc: Run all pre-commit hooks against all files
+    task: repo:pre-commit-run
+
+  tf:fmt:
+    desc: Format both OpenTofu stacks
+    task: repo:tf-fmt
+
+  stack:render:
+    desc: Render Docker runtime files from Doppler-managed secrets
+    task: docker:render
+
+  stack:config:
+    desc: Render and validate Docker Compose configuration using Doppler-managed secrets
+    task: docker:config
+
+  stack:deploy:
+    desc: Render runtime files and start the host-level Docker Compose stack using Doppler-managed secrets
+    task: docker:deploy
+
+  infra:provision:
+    desc: Apply the cluster OpenTofu stack
+    task: cluster:infra-provision
+
+  talos:genconfig:
+    desc: Generate Talos machine configuration
+    task: cluster:talos-genconfig
+
+  talos:bootstrap:
+    desc: Bootstrap Talos cluster and join nodes
+    task: cluster:talos-bootstrap
+
+  apps:bootstrap:
+    desc: Bootstrap cluster apps after Talos is healthy
+    task: cluster:apps-bootstrap
+
   sync-argo-bootstrap:
-    desc: Apply the Argo CD app-of-apps bootstrap resources (apps, repositories, settings)
-    cmds:
-      - kubectl --namespace argo-system apply --server-side --filename {{.ROOT_DIR}}/kubernetes/components/common/settings.yaml
-      - kubectl --namespace argo-system apply --server-side --filename {{.ROOT_DIR}}/kubernetes/components/common/repositories.yaml
-      - kubectl --namespace argo-system apply --server-side --filename {{.ROOT_DIR}}/kubernetes/components/common/apps.yaml
-    preconditions:
-      - test -f {{.KUBECONFIG}}
-      - test -f {{.ROOT_DIR}}/kubernetes/components/common/apps.yaml
-      - test -f {{.ROOT_DIR}}/kubernetes/components/common/repositories.yaml
-      - test -f {{.ROOT_DIR}}/kubernetes/components/common/settings.yaml
-      - which kubectl
+    desc: Apply the Argo CD app-of-apps bootstrap resources
+    task: cluster:argo-sync-bootstrap
 
   reconcile:
     desc: Force Argo to pull in changes from your Git repository
-    deps: [sync-argo-bootstrap]
-    cmd: argocd app list --project kubernetes -o name | xargs -I {} argocd app wait {} --sync --timeout 300
-    preconditions:
-      - test -f {{.KUBECONFIG}}
-      - which argocd
+    task: cluster:argo-reconcile
+
+  platform:cilium:
+    desc: Install and validate Cilium
+    task: cluster:platform-cilium
+
+  platform:ingress:
+    desc: Validate the Envoy Gateway ingress path
+    task: cluster:platform-ingress
+
+  platform:argocd:
+    desc: Install and validate Argo CD
+    task: cluster:platform-argocd
+
+  platform:observability:
+    desc: Install observability stack
+    task: cluster:platform-observability
+
+  verify:cluster:
+    desc: Run post-bootstrap verification checks
+    task: cluster:verify
+
+  tf:init:
+    desc: Initialize both root OpenTofu stacks
+    task: cluster:tf-init
+
+  tf:plan:
+    desc: Plan both root OpenTofu stacks
+    task: cluster:tf-plan
+
+  tf:apply:
+    desc: Apply both root OpenTofu stacks
+    task: cluster:tf-apply
+
+  tf:destroy:
+    desc: Destroy the imported cluster OpenTofu stack
+    task: cluster:tf-destroy
+
+  cluster:tf:init:
+    desc: Initialize the imported cluster OpenTofu stack
+    task: cluster:cluster-tf-init
+
+  cluster:tf:plan:
+    desc: Plan the imported cluster OpenTofu stack
+    task: cluster:cluster-tf-plan
+
+  cluster:tf:apply:
+    desc: Apply the imported cluster OpenTofu stack
+    task: cluster:cluster-tf-apply
+
+  cluster:sync-argo:
+    desc: Apply the Argo bootstrap resources from this repo
+    task: cluster:argo-sync-bootstrap
+
+  cluster:reconcile:
+    desc: Force Argo to reconcile the cluster apps
+    task: cluster:argo-reconcile
+
+  mgmt:init:
+    desc: Bootstrap the management host from inside this repo
+    task: management:init
+
+  mgmt:bootstrap:
+    desc: Bootstrap the management VM over SSH from this workstation
+    task: management:bootstrap

@@ -33,9 +33,9 @@ Per-service values such as `ARCANE_HOSTNAME` or `BESZEL_APP_URL` are now optiona
 Render runtime files and start the stack from this checkout:
 
 ```sh
-mise run stack:render
-mise run stack:config
-mise run stack:deploy
+task stack:render
+task stack:config
+task stack:deploy
 ```
 
 The deploy script renders `runtime/` and `infra/docker/.env`, then runs:
@@ -51,7 +51,7 @@ Enable it only when `BESZEL_AGENT_KEY` is set in Doppler:
 
 ```sh
 export COMPOSE_PROFILES=agent
-mise run stack:deploy
+task stack:deploy
 ```
 
 In the Beszel Hub, add the host system with `/beszel_socket/beszel.sock` as the Host / IP.

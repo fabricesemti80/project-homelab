@@ -1,0 +1,114 @@
+---
+version: '3'
+
+tasks:
+
+  infra-provision:
+    desc: Apply the cluster OpenTofu stack
+    task: tofu:apply
+
+  talos-genconfig:
+    desc: Generate Talos machine configuration
+    task: talos:generate-config
+
+  talos-bootstrap:
+    desc: Bootstrap Talos cluster and join nodes
+    task: bootstrap:talos
+
+  apps-bootstrap:
+    desc: Bootstrap cluster apps after Talos is healthy
+    task: bootstrap:apps
+
+  argo-sync-bootstrap:
+    desc: Apply the Argo CD app-of-apps bootstrap resources
+    cmds:
+      - kubectl --namespace argo-system apply --server-side --filename {{.ROOT_DIR}}/kubernetes/components/common/settings.yaml
+      - kubectl --namespace argo-system apply --server-side --filename {{.ROOT_DIR}}/kubernetes/components/common/repositories.yaml
+      - kubectl --namespace argo-system apply --server-side --filename {{.ROOT_DIR}}/kubernetes/components/common/apps.yaml
+    preconditions:
+      - test -f {{.KUBECONFIG}}
+      - test -f {{.ROOT_DIR}}/kubernetes/components/common/apps.yaml
+      - test -f {{.ROOT_DIR}}/kubernetes/components/common/repositories.yaml
+      - test -f {{.ROOT_DIR}}/kubernetes/components/common/settings.yaml
+      - which kubectl
+
+  argo-reconcile:
+    desc: Force Argo to pull in changes from your Git repository
+    deps: [argo-sync-bootstrap]
+    cmd: argocd app list --project kubernetes -o name | xargs -I {} argocd app wait {} --sync --timeout 300
+    preconditions:
+      - test -f {{.KUBECONFIG}}
+      - which argocd
+
+  platform-cilium:
+    desc: Install and validate Cilium
+    deps: [argo-sync-bootstrap]
+    cmds:
+      - kubectl --namespace argo-system get applications.argoproj.io cilium
+      - kubectl --namespace kube-system rollout status daemonset/cilium --timeout=5m
+
+  platform-ingress:
+    desc: Validate the Envoy Gateway ingress path
+    deps: [argo-sync-bootstrap]
+    cmds:
+      - kubectl --namespace argo-system get applications.argoproj.io envoy-gateway
+      - kubectl --namespace network rollout status deployment/envoy-gateway --timeout=5m
+
+  platform-argocd:
+    desc: Install and validate Argo CD
+    task: argo-sync-bootstrap
+
+  platform-observability:
+    desc: Install observability stack
+    deps: [argo-sync-bootstrap]
+    cmd: kubectl --namespace argo-system get applications.argoproj.io kube-prometheus-stack
+
+  verify:
+    desc: Run post-bootstrap verification checks
+    cmds:
+      - kubectl get nodes -o wide
+      - talosctl --talosconfig {{.ROOT_DIR}}/talos/clusterconfig/talosconfig health
+    preconditions:
+      - test -f {{.KUBECONFIG}}
+      - test -f {{.ROOT_DIR}}/talos/clusterconfig/talosconfig
+      - which kubectl talosctl
+
+  tf-init:
+    desc: Initialize both root OpenTofu stacks
+    cmds:
+      - doppler run --project project-homelab --config dev_homelab --name-transformer tf-var -- tofu -chdir={{.ROOT_DIR}}/infra/terraform init
+      - task tofu:init
+    preconditions:
+      - which doppler tofu
+
+  tf-plan:
+    desc: Plan both root OpenTofu stacks
+    cmds:
+      - doppler run --project project-homelab --config dev_homelab --name-transformer tf-var -- tofu -chdir={{.ROOT_DIR}}/infra/terraform plan
+      - task tofu:plan
+    preconditions:
+      - which doppler tofu
+
+  tf-apply:
+    desc: Apply both root OpenTofu stacks
+    cmds:
+      - doppler run --project project-homelab --config dev_homelab --name-transformer tf-var -- tofu -chdir={{.ROOT_DIR}}/infra/terraform apply -auto-approve
+      - task tofu:apply
+    preconditions:
+      - which doppler tofu
+
+  tf-destroy:
+    desc: Destroy the imported cluster OpenTofu stack
+    task: tofu:destroy
+
+  cluster-tf-init:
+    desc: Initialize the imported cluster OpenTofu stack
+    task: tofu:init
+
+  cluster-tf-plan:
+    desc: Plan the imported cluster OpenTofu stack
+    task: tofu:plan
+
+  cluster-tf-apply:
+    desc: Apply the imported cluster OpenTofu stack
+    task: tofu:apply

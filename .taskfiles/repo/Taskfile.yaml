@@ -1,0 +1,47 @@
+---
+version: '3'
+
+tasks:
+
+  validate:
+    desc: Validate repository structure and required files
+    cmd: bash {{.ROOT_DIR}}/scripts/validate.sh
+
+  deps:
+    desc: Install Helm dependencies for the cluster workflow
+    cmds:
+      - helm plugin list | grep -q 'secrets' || helm plugin install https://github.com/jkroepke/helm-secrets --verify=false
+      - helm plugin list | grep -q 'diff' || helm plugin install https://github.com/databus23/helm-diff --verify=false
+    preconditions:
+      - which helm
+
+  lint:
+    desc: Run linters manually with auto-fixing where possible
+    cmds:
+      - tofu -chdir={{.ROOT_DIR}}/infra/terraform fmt -recursive
+      - tofu -chdir={{.ROOT_DIR}}/terraform fmt -recursive
+      - shfmt -w -i 2 -s {{.ROOT_DIR}}/scripts/*.sh {{.ROOT_DIR}}/scripts/lib/*.sh {{.ROOT_DIR}}/infra/docker/scripts/*.sh
+      - yamllint {{.ROOT_DIR}}
+      - shellcheck {{.ROOT_DIR}}/scripts/*.sh {{.ROOT_DIR}}/scripts/lib/*.sh {{.ROOT_DIR}}/infra/docker/scripts/*.sh
+    preconditions:
+      - which tofu shfmt yamllint shellcheck
+
+  pre-commit-install:
+    desc: Install pre-commit git hooks
+    cmd: pre-commit install
+    preconditions:
+      - which pre-commit
+
+  pre-commit-run:
+    desc: Run all pre-commit hooks against all files
+    cmd: pre-commit run --all-files
+    preconditions:
+      - which pre-commit
+
+  tf-fmt:
+    desc: Format both OpenTofu stacks
+    cmds:
+      - tofu -chdir={{.ROOT_DIR}}/infra/terraform fmt -recursive
+      - tofu -chdir={{.ROOT_DIR}}/terraform fmt -recursive
+    preconditions:
+      - which tofu

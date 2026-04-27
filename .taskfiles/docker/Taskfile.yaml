@@ -1,0 +1,26 @@
+---
+version: '3'
+
+tasks:
+
+  render:
+    desc: Render Docker runtime files from Doppler-managed secrets
+    cmd: doppler run --project project-homelab --config dev_homelab -- bash {{.ROOT_DIR}}/infra/docker/scripts/render-secrets.sh
+    preconditions:
+      - which doppler
+      - test -f {{.ROOT_DIR}}/infra/docker/scripts/render-secrets.sh
+
+  config:
+    desc: Render and validate Docker Compose configuration using Doppler-managed secrets
+    cmd: doppler run --project project-homelab --config dev_homelab -- sh -lc 'bash {{.ROOT_DIR}}/infra/docker/scripts/render-secrets.sh && docker compose --project-directory {{.ROOT_DIR}}/infra/docker -f {{.ROOT_DIR}}/infra/docker/docker-compose.yml config --quiet'
+    preconditions:
+      - which docker doppler
+      - test -f {{.ROOT_DIR}}/infra/docker/docker-compose.yml
+      - test -f {{.ROOT_DIR}}/infra/docker/scripts/render-secrets.sh
+
+  deploy:
+    desc: Render runtime files and start the host-level Docker Compose stack using Doppler-managed secrets
+    cmd: doppler run --project project-homelab --config dev_homelab -- bash {{.ROOT_DIR}}/infra/docker/scripts/deploy.sh
+    preconditions:
+      - which doppler
+      - test -f {{.ROOT_DIR}}/infra/docker/scripts/deploy.sh

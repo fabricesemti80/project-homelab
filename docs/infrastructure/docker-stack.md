@@ -19,12 +19,12 @@ Omni and its Proxmox provider are intentionally not part of this Docker tier.
 
 ## Deployment Model
 
-The Docker stack is rendered and deployed from the Docker host checkout using `mise` tasks:
+The Docker stack is rendered and deployed from the Docker host checkout using `task`:
 
 ```bash
-mise run stack:render
-mise run stack:config
-mise run stack:deploy
+task stack:render
+task stack:config
+task stack:deploy
 ```
 
 ## Secrets and Runtime Files
