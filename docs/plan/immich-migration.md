@@ -5,7 +5,7 @@
 -   [x] Preserve the original Docker Swarm Immich source as fallback
 -   [x] Preserve NFS-backed media files
 -   [x] Accept a fresh Immich database rebuild
--   [x] Use a temporary Kubernetes hostname before cutover
+-   [x] Use the final `photos.krapulax.dev` route in Kubernetes
 
 ## Repo Scaffolding
 
@@ -23,7 +23,7 @@
 ## Kubernetes Operator Steps
 
 -   [x] Add `IMMICH_DB_PASSWORD` to Doppler for the Kubernetes Immich app
--   [ ] Open `https://photos-next.krapulax.dev`
+-   [ ] Open `https://photos.krapulax.dev`
 -   [ ] Complete fresh Immich onboarding
 -   [ ] Add the NFS-backed paths as external libraries if needed
 -   [ ] Trigger library scan/import

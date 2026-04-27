@@ -5,7 +5,7 @@ metadata:
   name: immich
   namespace: media
   annotations:
-    external-dns.alpha.kubernetes.io/hostname: photos-next.krapulax.dev
+    external-dns.alpha.kubernetes.io/hostname: photos.krapulax.dev
     external-dns.alpha.kubernetes.io/target: external.krapulax.dev
 spec:
   parentRefs:
@@ -13,7 +13,7 @@ spec:
       namespace: network
       sectionName: https
   hostnames:
-    - photos-next.krapulax.dev
+    - photos.krapulax.dev
   rules:
     - backendRefs:
         - name: immich

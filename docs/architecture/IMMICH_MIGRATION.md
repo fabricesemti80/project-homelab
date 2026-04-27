@@ -26,7 +26,7 @@ Legacy Dockerlab layout:
 
 Use a non-destructive fresh-rebuild migration:
 
-1. Build the Kubernetes Immich stack with a temporary hostname and fresh CephFS-backed service state.
+1. Build the Kubernetes Immich stack with fresh CephFS-backed service state.
 2. Let the new Kubernetes Immich instance create a fresh database and re-import the media from the existing NFS-backed paths.
 
 The old Swarm storage paths remain untouched. No source directories are deleted or repurposed as part of this migration.
@@ -45,8 +45,8 @@ This is acceptable for the current migration because the priority is to keep the
 
 -   Namespace:
     -   `media`
--   Temporary validation hostname:
-    -   `photos-next.krapulax.dev`
+-   Public hostname:
+    -   `photos.krapulax.dev`
 -   Components:
     -   `immich-server`
     -   `immich-machine-learning`
@@ -74,7 +74,7 @@ This is acceptable for the current migration because the priority is to keep the
 
 ## Cutover Model
 
-Initial Kubernetes validation uses `photos-next.krapulax.dev` so the original `photos.krapulax.dev` Swarm endpoint remains untouched.
+Kubernetes Immich now serves the public `photos.krapulax.dev` hostname directly.
 
 After validation:
 
@@ -85,7 +85,7 @@ After validation:
 
 -   The NFS export still contains the legacy Immich directory at `/media/immich`
 -   The cluster can mount the same NFS library currently used by Jellyfin
--   Temporary hostname `photos-next.krapulax.dev` is acceptable during validation
+-   the old Swarm service can be left available as a fallback, but not on the same active hostname
 
 ## Validation
 
@@ -100,4 +100,4 @@ After validation:
 -   do not delete or modify the source Swarm stack storage
 -   remove the Kubernetes Immich app from Argo if deployed
 -   keep the Kubernetes PostgreSQL PVC for inspection unless a clean rebuild is chosen
--   continue serving Immich from the original Swarm stack on `photos.krapulax.dev`
+-   restore `photos.krapulax.dev` to the original Swarm stack if Kubernetes rollback is needed

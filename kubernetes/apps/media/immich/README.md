@@ -4,8 +4,8 @@ This app is scaffolded for a non-destructive fresh rebuild from the legacy Docke
 
 Current intent:
 
--   keep the old Swarm source untouched until cutover
--   validate Kubernetes Immich on `https://photos-next.krapulax.dev`
+-   keep the old Swarm source storage untouched as fallback
+-   serve Kubernetes Immich on `https://photos.krapulax.dev`
 -   keep the photo and video files in place on NFS
 -   use a fresh Immich database in Kubernetes
 
@@ -31,11 +31,11 @@ Important migration rule:
 -   do not point Kubernetes PostgreSQL at the old Swarm PostgreSQL data directory
 -   the old Swarm database is intentionally left untouched as fallback
 
-Validation hostname:
+Route:
 
--   `https://photos-next.krapulax.dev`
+-   `https://photos.krapulax.dev`
 
 Cutover note:
 
--   keep `photos.krapulax.dev` on the old Swarm service until the Kubernetes migration is validated
+-   the old Swarm service should not keep serving `photos.krapulax.dev` once this route is active
 -   expect albums and other Immich metadata to be rebuilt in the new instance
