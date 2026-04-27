@@ -20,9 +20,9 @@ spec:
         releaseName: glance
         valueFiles:
           - $repo/kubernetes/apps/web/glance/values.yaml
-   destination:
-     name: in-cluster
-     namespace: web
+  destination:
+    name: in-cluster
+    namespace: web
   syncPolicy:
     automated:
       allowEmpty: true
