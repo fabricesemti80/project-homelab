@@ -6,6 +6,7 @@
 -   [x] Preserve NFS-backed media files
 -   [x] Accept a fresh Immich database rebuild
 -   [x] Use the final `photos.krapulax.dev` route in Kubernetes
+-   [x] Add an internal-only companion hostname
 
 ## Repo Scaffolding
 
@@ -24,6 +25,7 @@
 
 -   [x] Add `IMMICH_DB_PASSWORD` to Doppler for the Kubernetes Immich app
 -   [ ] Open `https://photos.krapulax.dev`
+-   [ ] Open `https://photos-internal.krapulax.dev`
 -   [ ] Complete fresh Immich onboarding
 -   [ ] Add the NFS-backed paths as external libraries if needed
 -   [ ] Trigger library scan/import

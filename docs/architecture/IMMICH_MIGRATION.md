@@ -47,6 +47,8 @@ This is acceptable for the current migration because the priority is to keep the
     -   `media`
 -   Public hostname:
     -   `photos.krapulax.dev`
+-   Internal hostname:
+    -   `photos-internal.krapulax.dev`
 -   Components:
     -   `immich-server`
     -   `immich-machine-learning`
@@ -75,6 +77,7 @@ This is acceptable for the current migration because the priority is to keep the
 ## Cutover Model
 
 Kubernetes Immich now serves the public `photos.krapulax.dev` hostname directly.
+It also exposes an internal gateway hostname at `photos-internal.krapulax.dev`.
 
 After validation:
 
@@ -89,7 +92,8 @@ After validation:
 
 ## Validation
 
--   Kubernetes Immich app starts on the temporary hostname
+-   Kubernetes Immich app starts on `photos.krapulax.dev`
+-   internal access works on `photos-internal.krapulax.dev`
 -   onboarding completes successfully on a fresh database
 -   assets appear after import and/or external library scan
 -   the external library path is visible to Immich at `/external-library`
