@@ -10,7 +10,7 @@ spec:
   project: kubernetes
   sources:
     - repoURL: "https://github.com/fabricesemti80/project-homelab.git"
-      path: kubernetes/apps/default/glance
+      path: kubernetes/apps/web/glance
       targetRevision: main
       ref: repo
     - repoURL: ghcr.io/bjw-s-labs/helm
@@ -20,9 +20,9 @@ spec:
         releaseName: glance
         valueFiles:
           - $repo/kubernetes/apps/default/glance/values.yaml
-  destination:
-    name: in-cluster
-    namespace: default
+   destination:
+     name: in-cluster
+     namespace: web
   syncPolicy:
     automated:
       allowEmpty: true
