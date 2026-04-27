@@ -25,7 +25,7 @@
 
 -   [x] Add `IMMICH_DB_PASSWORD` to Doppler for the Kubernetes Immich app
 -   [ ] Open `https://photos.krapulax.dev`
--   [ ] Open `https://photos-internal.krapulax.dev`
+-   [ ] Open `http://photos.krapulax.home`
 -   [ ] Complete fresh Immich onboarding
 -   [ ] Add the NFS-backed paths as external libraries if needed
 -   [ ] Trigger library scan/import

@@ -6,7 +6,7 @@ Current intent:
 
 -   keep the old Swarm source storage untouched as fallback
 -   serve Kubernetes Immich on `https://photos.krapulax.dev`
--   also expose an internal-only companion hostname at `https://photos-internal.krapulax.dev`
+-   also expose an internal-only companion hostname at `http://photos.krapulax.home`
 -   keep the photo and video files in place on NFS
 -   use a fresh Immich database in Kubernetes
 
@@ -35,7 +35,7 @@ Important migration rule:
 Route:
 
 -   `https://photos.krapulax.dev`
--   `https://photos-internal.krapulax.dev`
+-   `http://photos.krapulax.home`
 
 Cutover note:
 

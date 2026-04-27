@@ -4,16 +4,13 @@ kind: HTTPRoute
 metadata:
   name: immich-internal
   namespace: media
-  annotations:
-    external-dns.alpha.kubernetes.io/hostname: photos-internal.krapulax.dev
-    external-dns.alpha.kubernetes.io/target: internal.krapulax.dev
 spec:
   parentRefs:
     - name: envoy-internal
       namespace: network
-      sectionName: https
+      sectionName: http
   hostnames:
-    - photos-internal.krapulax.dev
+    - photos.krapulax.home
   rules:
     - backendRefs:
         - name: immich
