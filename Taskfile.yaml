@@ -73,83 +73,83 @@ tasks:
 
   stack:render:
     desc: Render Docker runtime files from Doppler-managed secrets
-    task: docker:render
+    cmd: task docker:render
 
   stack:config:
     desc: Render and validate Docker Compose configuration using Doppler-managed secrets
-    task: docker:config
+    cmd: task docker:config
 
   stack:deploy:
     desc: Render runtime files and start the host-level Docker Compose stack using Doppler-managed secrets
-    task: docker:deploy
+    cmd: task docker:deploy
 
   infra:provision:
     desc: Apply both OpenTofu stacks in execution order
-    task: infrastructure:tf-apply
+    cmd: task infrastructure:tf-apply
 
   talos:genconfig:
     desc: Generate Talos machine configuration
-    task: cluster:talos-genconfig
+    cmd: task talos:generate-config
 
   talos:bootstrap:
     desc: Bootstrap Talos cluster and join nodes
-    task: cluster:talos-bootstrap
+    cmd: task bootstrap:talos
 
   apps:bootstrap:
     desc: Bootstrap cluster apps after Talos is healthy
-    task: cluster:apps-bootstrap
+    cmd: task bootstrap:apps
 
   sync-argo-bootstrap:
     desc: Apply the Argo CD app-of-apps bootstrap resources
-    task: infrastructure:argo-sync-bootstrap
+    cmd: task infrastructure:argo-sync-bootstrap
 
   reconcile:
     desc: Force Argo to pull in changes from your Git repository
-    task: infrastructure:argo-reconcile
+    cmd: task infrastructure:argo-reconcile
 
   platform:cilium:
     desc: Install and validate Cilium
-    task: infrastructure:platform-cilium
+    cmd: task infrastructure:platform-cilium
 
   platform:ingress:
     desc: Validate the Envoy Gateway ingress path
-    task: infrastructure:platform-ingress
+    cmd: task infrastructure:platform-ingress
 
   platform:argocd:
     desc: Install and validate Argo CD
-    task: infrastructure:platform-argocd
+    cmd: task infrastructure:platform-argocd
 
   platform:observability:
     desc: Install observability stack
-    task: infrastructure:platform-observability
+    cmd: task infrastructure:platform-observability
 
   verify:cluster:
     desc: Run post-bootstrap verification checks
-    task: infrastructure:verify
+    cmd: task infrastructure:verify
 
   tf:init:
     desc: Initialize both OpenTofu stacks in execution order
-    task: infrastructure:tf-init
+    cmd: task infrastructure:tf-init
 
   tf:plan:
     desc: Plan node infrastructure first, then shared infra
-    task: infrastructure:tf-plan
+    cmd: task infrastructure:tf-plan
 
   tf:apply:
     desc: Apply node infrastructure first, then shared infra
-    task: infrastructure:tf-apply
+    cmd: task infrastructure:tf-apply
 
   tf:destroy:
     desc: Destroy shared infra first, then node infrastructure
-    task: infrastructure:tf-destroy
+    cmd: task infrastructure:tf-destroy
 
   cluster:sync-argo:
     desc: Apply the Argo bootstrap resources from this repo
-    task: infrastructure:argo-sync-bootstrap
+    cmd: task infrastructure:argo-sync-bootstrap
 
   cluster:reconcile:
     desc: Force Argo to reconcile the cluster apps
-    task: infrastructure:argo-reconcile
+    cmd: task infrastructure:argo-reconcile
 
   mgmt:init:
     desc: Bootstrap the management host from inside this repo
