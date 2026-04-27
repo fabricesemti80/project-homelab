@@ -19,7 +19,7 @@ spec:
       helm:
         releaseName: glance
         valueFiles:
-          - $repo/kubernetes/apps/default/glance/values.yaml
+          - $repo/kubernetes/apps/web/glance/values.yaml
    destination:
      name: in-cluster
      namespace: web
