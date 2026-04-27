@@ -21,13 +21,11 @@ task tf:plan
 task tf:apply
 ```
 
-Cluster-only aliases:
+Execution order:
 
-```bash
-task cluster:tf:init
-task cluster:tf:plan
-task cluster:tf:apply
-```
+-   `task tf:init` initializes the node stack in `terraform/` first, then the shared infra stack in `infra/terraform/`
+-   `task tf:plan` plans nodes first, then shared infra
+-   `task tf:apply` applies nodes first, then shared infra
 
 ## Related Documents
 

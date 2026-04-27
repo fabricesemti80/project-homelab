@@ -33,8 +33,8 @@ The imported Terraform module originally forced every Talos VM to `started = tru
 
 1. Push `project-homelab` with the imported cluster workspace to GitHub.
 2. In `terraform/nodes.auto.tfvars`, keep worker nodes `started = false` and control-plane nodes `true` unless you are also removing the VM definitions in the same change.
-3. Run `task tofu:init`.
-4. Run `task tofu:plan` and confirm the plan is limited to the repo/path-related changes you expect.
+3. Run `task tf:init`.
+4. Run `task tf:plan` and confirm the plan is limited to the repo/path-related changes you expect.
 5. Power on only the control-plane VMs if they are currently off.
 6. Verify Talos and Kubernetes health from the imported workspace.
 7. Apply the Argo bootstrap resources from the imported workspace so the cluster pulls from `project-homelab`.
@@ -43,7 +43,7 @@ The imported Terraform module originally forced every Talos VM to `started = tru
 
 ## Validation
 
--   `task tofu:plan`
+-   `task tf:plan`
 -   `kubectl get nodes -o wide`
 -   `talosctl --talosconfig talos/clusterconfig/talosconfig health`
 -   `kubectl get applications -n argo-system`

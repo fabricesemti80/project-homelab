@@ -28,8 +28,8 @@ Operate the homelab from a single primary repository while keeping changes small
 
 ## Validation Checks
 
--   `task tofu:init`
--   `task tofu:plan`
+-   `task tf:init`
+-   `task tf:plan`
 -   `kubectl get nodes`
 -   `talosctl --talosconfig talos/clusterconfig/talosconfig config info`
 -   `task sync-argo-bootstrap`

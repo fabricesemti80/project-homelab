@@ -19,13 +19,10 @@ env:
 
 includes:
   bootstrap: .taskfiles/bootstrap
-  cluster: .taskfiles/cluster
   docker: .taskfiles/docker
-  management: .taskfiles/management
-  repo: .taskfiles/repo
+  infrastructure: .taskfiles/infrastructure
   talos: .taskfiles/talos
   template: .taskfiles/template
-  tofu: .taskfiles/tofu
 
 tasks:
 
@@ -33,27 +30,46 @@ tasks:
 
   validate:
     desc: Validate repository structure and required files
-    task: repo:validate
+    cmd: bash {{.ROOT_DIR}}/scripts/validate.sh
 
   deps:
     desc: Install Helm dependencies for the cluster workflow
-    task: repo:deps
+    cmds:
+      - helm plugin list | grep -q 'secrets' || helm plugin install https://github.com/jkroepke/helm-secrets --verify=false
+      - helm plugin list | grep -q 'diff' || helm plugin install https://github.com/databus23/helm-diff --verify=false
+    preconditions:
+      - which helm
 
   lint:
     desc: Run linters manually with auto-fixing where possible
-    task: repo:lint
+    cmds:
+      - tofu -chdir={{.ROOT_DIR}}/infra/terraform fmt -recursive
+      - tofu -chdir={{.ROOT_DIR}}/terraform fmt -recursive
+      - shfmt -w -i 2 -s {{.ROOT_DIR}}/scripts/*.sh {{.ROOT_DIR}}/scripts/lib/*.sh {{.ROOT_DIR}}/infra/docker/scripts/*.sh
+      - yamllint {{.ROOT_DIR}}
+      - shellcheck {{.ROOT_DIR}}/scripts/*.sh {{.ROOT_DIR}}/scripts/lib/*.sh {{.ROOT_DIR}}/infra/docker/scripts/*.sh
+    preconditions:
+      - which tofu shfmt yamllint shellcheck
 
   pre-commit:install:
     desc: Install pre-commit git hooks
-    task: repo:pre-commit-install
+    cmd: pre-commit install
+    preconditions:
+      - which pre-commit
 
   pre-commit:run:
     desc: Run all pre-commit hooks against all files
-    task: repo:pre-commit-run
+    cmd: pre-commit run --all-files
+    preconditions:
+      - which pre-commit
 
   tf:fmt:
     desc: Format both OpenTofu stacks
-    task: repo:tf-fmt
+    cmds:
+      - tofu -chdir={{.ROOT_DIR}}/infra/terraform fmt -recursive
+      - tofu -chdir={{.ROOT_DIR}}/terraform fmt -recursive
+    preconditions:
+      - which tofu
 
   stack:render:
     desc: Render Docker runtime files from Doppler-managed secrets
@@ -68,8 +84,8 @@ tasks:
     task: docker:deploy
 
   infra:provision:
-    desc: Apply the cluster OpenTofu stack
-    task: cluster:infra-provision
+    desc: Apply both OpenTofu stacks in execution order
+    task: infrastructure:tf-apply
 
   talos:genconfig:
     desc: Generate Talos machine configuration
@@ -85,72 +101,64 @@ tasks:
 
   sync-argo-bootstrap:
     desc: Apply the Argo CD app-of-apps bootstrap resources
-    task: cluster:argo-sync-bootstrap
+    task: infrastructure:argo-sync-bootstrap
 
   reconcile:
     desc: Force Argo to pull in changes from your Git repository
-    task: cluster:argo-reconcile
+    task: infrastructure:argo-reconcile
 
   platform:cilium:
     desc: Install and validate Cilium
-    task: cluster:platform-cilium
+    task: infrastructure:platform-cilium
 
   platform:ingress:
     desc: Validate the Envoy Gateway ingress path
-    task: cluster:platform-ingress
+    task: infrastructure:platform-ingress
 
   platform:argocd:
     desc: Install and validate Argo CD
-    task: cluster:platform-argocd
+    task: infrastructure:platform-argocd
 
   platform:observability:
     desc: Install observability stack
-    task: cluster:platform-observability
+    task: infrastructure:platform-observability
 
   verify:cluster:
     desc: Run post-bootstrap verification checks
-    task: cluster:verify
+    task: infrastructure:verify
 
   tf:init:
-    desc: Initialize both root OpenTofu stacks
-    task: cluster:tf-init
+    desc: Initialize both OpenTofu stacks in execution order
+    task: infrastructure:tf-init
 
   tf:plan:
-    desc: Plan both root OpenTofu stacks
-    task: cluster:tf-plan
+    desc: Plan node infrastructure first, then shared infra
+    task: infrastructure:tf-plan
 
   tf:apply:
-    desc: Apply both root OpenTofu stacks
-    task: cluster:tf-apply
+    desc: Apply node infrastructure first, then shared infra
+    task: infrastructure:tf-apply
 
   tf:destroy:
-    desc: Destroy the imported cluster OpenTofu stack
-    task: cluster:tf-destroy
-
-  cluster:tf:init:
-    desc: Initialize the imported cluster OpenTofu stack
-    task: cluster:cluster-tf-init
-
-  cluster:tf:plan:
-    desc: Plan the imported cluster OpenTofu stack
-    task: cluster:cluster-tf-plan
-
-  cluster:tf:apply:
-    desc: Apply the imported cluster OpenTofu stack
-    task: cluster:cluster-tf-apply
+    desc: Destroy shared infra first, then node infrastructure
+    task: infrastructure:tf-destroy
 
   cluster:sync-argo:
     desc: Apply the Argo bootstrap resources from this repo
-    task: cluster:argo-sync-bootstrap
+    task: infrastructure:argo-sync-bootstrap
 
   cluster:reconcile:
     desc: Force Argo to reconcile the cluster apps
-    task: cluster:argo-reconcile
+    task: infrastructure:argo-reconcile
 
   mgmt:init:
     desc: Bootstrap the management host from inside this repo
-    task: management:init
+    cmd: bash {{.ROOT_DIR}}/scripts/management-init.sh
+    preconditions:
+      - test -f {{.ROOT_DIR}}/scripts/management-init.sh
 
   mgmt:bootstrap:
     desc: Bootstrap the management VM over SSH from this workstation
-    task: management:bootstrap
+    cmd: bash {{.ROOT_DIR}}/scripts/bootstrap-management-vm.sh
+    preconditions:
+      - test -f {{.ROOT_DIR}}/scripts/bootstrap-management-vm.sh
