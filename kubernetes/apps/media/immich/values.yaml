@@ -1,6 +1,7 @@
 ---
 controllers:
   immich:
+    replicas: 1
     strategy: RollingUpdate
     containers:
       app:
@@ -9,7 +10,7 @@ controllers:
           tag: release
         env:
           TZ: Europe/London
-          DB_HOSTNAME: database
+          DB_HOSTNAME: immich-database
           DB_USERNAME: postgres
           DB_PASSWORD:
             valueFrom:
@@ -17,8 +18,8 @@ controllers:
                 name: immich-secrets
                 key: IMMICH_DB_PASSWORD
           DB_DATABASE_NAME: immich
-          REDIS_HOSTNAME: redis
-          IMMICH_MACHINE_LEARNING_URL: http://machine-learning:3003
+          REDIS_HOSTNAME: immich-redis
+          IMMICH_MACHINE_LEARNING_URL: http://immich-machine-learning:3003
           UPLOAD_LOCATION: /data
         probes:
           liveness: &immich-probes
@@ -42,6 +43,7 @@ controllers:
             memory: 4Gi
 
   machine-learning:
+    replicas: 1
     strategy: RollingUpdate
     containers:
       app:
@@ -72,6 +74,7 @@ controllers:
             memory: 4Gi
 
   redis:
+    replicas: 1
     strategy: RollingUpdate
     containers:
       app:
@@ -99,6 +102,7 @@ controllers:
 
   database:
     type: statefulset
+    replicas: 1
     strategy: RollingUpdate
     containers:
       app:
